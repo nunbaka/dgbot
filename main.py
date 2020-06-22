@@ -14,22 +14,25 @@ from library import Json, getCurrentTime
 
 class Client(discord.Client):
     def __init__(self):
-        self.tokens = Json.loadWrite(pathfile='private/tokens.json')
+        super().__init__()
+        self.tokens = Json.loadWrite(pathfile='private/token.json')
         self.bot = "dev"
         self.version = "0.001"
         self.name = "DGBot"
-        #self.guildManagers = {}
+        self.guildManagers = {}
         self.prefixes = Json.loadWrite(pathfile='private/prefixes.json')
         self.run(self.tokens[self.bot])
-        pass
-    async def run(self):
+
+    async def on_ready(self):
         cur_time = getCurrentTime()
         print(f"{self.name} [{self.bot}] - {self.version} init at {cur_time}")
         for guild in self.guilds:
             print(f"\t{guild.name}:{guild.id} connected")
-        pass
+
     async def on_message(self, message):
-        pass
-    async def on_ready(self):
-        pass
+        if message.author == self.user:
+            return
+        if not message.guild:
+            return
+
 client = Client()
