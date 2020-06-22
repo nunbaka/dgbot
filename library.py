@@ -25,13 +25,14 @@ def handleArgs(content):
             args.append(word)
     a = []
     text = ""
+    found = False
     for arg in args:
         if arg.startswith("\"") and not arg.endswith("\n"):
             found = True
         if found:
-            text += arg
+            text += arg+" "
             if arg.endswith("\"") and not arg.startswith("\""):
-                a.append(text[1:-1])
+                a.append(text[1:-2])
                 text = ""
                 found = False
         else:
