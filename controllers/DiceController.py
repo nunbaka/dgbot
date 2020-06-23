@@ -1,9 +1,18 @@
 from random import randrange
+from context import Context
 import re
 
 # nDices = Numero de dados em uma rolagem
 # nFaces = Numero de faces de cada dado
 # dices = Lista de dados rolados
+
+
+class Roll:
+    def __init__(self, nDices, nFaces, total, dices):
+        self.nDices = nDices
+        self.nFaces = nFaces
+        self.total = total
+        self.dices = dices
 
 
 class DiceController:
@@ -14,17 +23,17 @@ class DiceController:
             'r': self.r
         }
 
-    async def r(self, context):
+    async def r(self, context: Context):
         try:
             total, expression = self.getExpression(context.args)
         except Exception:
-            await context.sendChannel("Error na argumentação")
+            await context.sendChannel(self.strings['arg_error'])
             return
         # ENVIANDO UM ROLL
         await context.sendChannel(
             self.strings['roll'], total=total, expression=expression)
 
-    def roll(self, nDices, nFaces):
+    def roll(self, nDices, nFaces) -> Roll:
         # soma total dos dados
         total = 0
         # lista de dados rolado
@@ -64,11 +73,3 @@ class DiceController:
         # CALCULANDO A EXPRESSÃO DE TOTAL ENCONTRADA
         total = eval(total)
         return total, expression
-
-
-class Roll:
-    def __init__(self, nDices, nFaces, total, dices):
-        self.nDices = nDices
-        self.nFaces = nFaces
-        self.total = total
-        self.dices = dices

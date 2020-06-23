@@ -1,8 +1,11 @@
 {
+    "arg_error":{
+        "content":"<#author>, os argumentos devem ser números ou dados\n/r (Numero de Dados)d(Faces)"
+    },
     "roll":{
-        "content":"<#author> rolou <#expression>, TOTAL: <#total>",
+        "content":"<#author> rolou <#expression>",
         "embed":{
-            "title":"**Rolou um dado e tanto!**",
+            "title":"**Total da rolagem: <#total>**",
             "image-url":"",
             "description":"<#comment>",
             "color":16109122,

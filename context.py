@@ -1,9 +1,9 @@
 from library import existKey
-from discord import Embed
+import discord
 
 
 class Context:
-    def __init__(self, client, prefix, message):
+    def __init__(self, client, prefix, message: discord.Message):
         self.client = client
         self.prefix = prefix
         self.message = message
@@ -18,19 +18,22 @@ class Context:
 
     async def sendChannel(self, message, **kv):
         content = self.getMessage(message['content'], **kv)
-        embed = self.getEmbed(message['embed'], **kv)
-        reactions = message['reactions']
+        embed = None
+        if existKey('embed', message):
+            embed = self.getEmbed(message['embed'], **kv)
         ctx = await self.channel.send(content, embed=embed)
-        for reaction in reactions:
-            try:
-                await ctx.add_reaction(reaction)
-            except Exception:
-                pass
+        if existKey("reactions", message):
+            reactions = message['reactions']
+            for reaction in reactions:
+                try:
+                    await ctx.add_reaction(reaction)
+                except Exception:
+                    pass
 
     def sendAuthor(self):
         pass
 
-    def getMessage(self, message, total="", expression=""):
+    def getMessage(self, message: str, total="", expression=""):
         replaces = {
             ("<#author>", self.author.mention),
             ("<#total>", str(total)),
@@ -42,14 +45,15 @@ class Context:
             message = message.replace(r, v)
         return message
 
-    def getEmbed(self, embed, **kv):
+    def getEmbed(self, embed: dict, **kv) -> discord.Embed:
         if len(list(embed.keys())) == 0:
             return None
-        e = Embed(
+        e = discord.Embed(
             title=self.getMessage(embed['title'], **kv),
             description=self.getMessage(embed['description'], **kv),
             color=embed['color'])
-        e.set_image(url=embed['image-url'])
+        if existKey("image-url", embed):
+            e.set_image(url=embed['image-url'])
         if existKey('fields', embed):
             for field in embed['fields']:
                 inline = True
