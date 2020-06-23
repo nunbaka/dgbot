@@ -37,9 +37,10 @@ def handleArgs(content):
                 found = False
         else:
             a.append(arg)
-    if len(text)>0:
+    if len(text) > 0:
         a = a + text.split()
     return a, message.rstrip()[1:]
+
 
 def getCurrentTime():
     currentDT = datetime.datetime.now()
