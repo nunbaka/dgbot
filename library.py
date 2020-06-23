@@ -52,15 +52,6 @@ def getKey():
     return currentDT.strftime("%d%H%M%S")
 
 
-def handleExpression(args):
-    expression = " ".join(args)
-    ops = ["/", "*", "+", "-"]
-    for op in ops:
-        expression = expression.replace(op, " "+op+" ")
-    expression = expression.strip().replace("  ", " ")
-    return expression
-
-
 class Json:
     def load(pathfile="", encoding='utf-8'):
         try:

@@ -1,5 +1,6 @@
 from random import randrange
 from context import Context
+from classes import Club
 import re
 
 # nDices = Numero de dados em uma rolagem
@@ -8,7 +9,11 @@ import re
 
 
 class Roll:
-    def __init__(self, nDices, nFaces, total, dices):
+    def __init__(self,
+                 nDices: int,
+                 nFaces: int,
+                 total: int,
+                 dices: list):
         self.nDices = nDices
         self.nFaces = nFaces
         self.total = total
@@ -16,7 +21,7 @@ class Roll:
 
 
 class DiceController:
-    def __init__(self, club):
+    def __init__(self, club: Club):
         self.club = club
         self.strings = self.club.strings.dc
         self.commands = {
@@ -29,11 +34,11 @@ class DiceController:
         except Exception:
             await context.sendChannel(self.strings['arg_error'])
             return
-        # ENVIANDO UM ROLL
-        await context.sendChannel(
+        # ENVIANDO UM ROLL, Retornando a mensagem
+        return await context.sendChannel(
             self.strings['roll'], total=total, expression=expression)
 
-    def roll(self, nDices, nFaces) -> Roll:
+    def roll(self, nDices: int, nFaces: int) -> Roll:
         # soma total dos dados
         total = 0
         # lista de dados rolado
@@ -51,7 +56,7 @@ class DiceController:
         # EXPRESSAO É OS ARGUMENTOS TRABALHADOS
         expression = ""
         # O PADRÃO DE UM DADO
-        pattern = re.compile("\d*d\d+")
+        pattern = re.compile('\d*d\d+')
         for arg in args:
             # INCREMENTANDO TOTAL E EXPRESSAO COM O ARGUMENTO
             total += arg+" "

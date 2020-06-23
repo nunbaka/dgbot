@@ -1,3 +1,4 @@
+import discord
 from library import handleArgs
 from controllers.DiceController import DiceController
 
@@ -5,8 +6,9 @@ from controllers.DiceController import DiceController
 
 
 class Club:
-    def __init__(self, ckey, strings):
+    def __init__(self, ckey, guild: discord.Guild, strings):
         self.key = ckey
+        self.guild = guild
         self.strings = strings
         self.dc = DiceController(self)
 
