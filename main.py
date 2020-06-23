@@ -2,6 +2,7 @@ import discord
 from library import Json, getCurrentTime, existKey
 from context import Context
 from classes.Club import Club
+from classes.Language import Language
 
 # user = UserDiscord
 # users = Lista de UserDiscord
@@ -28,6 +29,9 @@ class Client(discord.Client):
         self.clubs = {}
         # self.prefixes contém os prefixos de cada club
         self.prefixes = Json.loadWrite(pathfile='private/prefixes.json')
+        self.languages = Json.loadWrite(pathfile='private/languages.json')
+        self.language = Language()
+
         # roda o client pela chave do token
         self.run(self.tokens[self.bot])
 
@@ -48,6 +52,7 @@ class Client(discord.Client):
             # verifica se a mensagem foi enviada em uma guild
             return
         # recebe o prefixo da guild em questão
+
         prefix = self.getPrefix(message.guild)
         # instancia um club a partir da guild
         club = self.getClub(message.guild)
@@ -60,7 +65,8 @@ class Client(discord.Client):
         cKey = str(guild.id)
         if not existKey(cKey, self.clubs):
             # se a chave não existir no dicionario, instancia um club na ref
-            self.clubs[cKey] = Club(cKey)
+            strings = self.getLanguage(guild)
+            self.clubs[cKey] = Club(cKey, strings)
         return self.clubs[cKey]
 
     def getPrefix(self, guild):
@@ -72,6 +78,19 @@ class Client(discord.Client):
         else:
             # se existir prefixo, retorne-o
             return self.prefixes[cKey]
+
+    def getLanguage(self, guild):
+        # cria a chave da guild
+        languages = {
+            "portuguese": self.language.portuguese
+        }
+        cKey = str(guild.id)
+        if not existKey(cKey, self.languages):
+            # se o prefixo não existir
+            return languages['portuguese']
+        else:
+            # se existir prefixo, retorne-o
+            return languages[self.languages[cKey]]
 
 
 client = Client()

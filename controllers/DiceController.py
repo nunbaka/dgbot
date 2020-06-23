@@ -9,6 +9,7 @@ import re
 class DiceController:
     def __init__(self, club):
         self.club = club
+        self.strings = self.club.strings.dc
         self.commands = {
             'r': self.r
         }
@@ -21,7 +22,7 @@ class DiceController:
             return
         # ENVIANDO UM ROLL
         await context.sendChannel(
-            f"{context.author.mention} rolou {expression}, TOTAL: {total}")
+            self.strings['roll'], total=total, expression=expression)
 
     def roll(self, nDices, nFaces):
         # soma total dos dados
@@ -36,22 +37,31 @@ class DiceController:
         return Roll(nDices, nFaces, total, dices)
 
     def getExpression(self, args):
+        # TOTAL É A EXPRESSAO SOMENTE COM OS RESULTADOS
         total = ""
+        # EXPRESSAO É OS ARGUMENTOS TRABALHADOS
         expression = ""
+        # O PADRÃO DE UM DADO
         pattern = re.compile("\d*d\d+")
         for arg in args:
+            # INCREMENTANDO TOTAL E EXPRESSAO COM O ARGUMENTO
             total += arg+" "
             expression += arg+" "
             dices = pattern.findall(arg)
+            # ACHANDO OS PADRÕES DE DADO
             for dice in dices:
                 nDices, nFaces = dice.split('d')
                 if len(nDices) == 0:
                     nDices = 1
+                # ROLANDO O DADO DE CADA OCORRENCIA
                 roll = self.roll(int(nDices), int(nFaces))
+                # SUBSTITUINDO O ORIGINAL PELO TOTAL
                 total = total.replace(dice, str(roll.total), 1)
+                # SUBSTITUINDO O ORIGINAL PELO TRATADO
                 expression = expression.replace(
                     dice,
                     f"{roll.nDices}d{roll.nFaces}, {roll.dices}: {roll.total}", 1)
+        # CALCULANDO A EXPRESSÃO DE TOTAL ENCONTRADA
         total = eval(total)
         return total, expression
 

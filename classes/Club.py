@@ -1,23 +1,25 @@
 from library import handleArgs
 from controllers.DiceController import DiceController
 
-#COMANDOS ESTÃO EM CONTROLLERS
+# COMANDOS ESTÃO EM CONTROLLERS
+
 
 class Club:
-    def __init__(self, ckey):
+    def __init__(self, ckey, strings):
         self.key = ckey
+        self.strings = strings
         self.dc = DiceController(self)
-        
+
     async def run(self, context):
         controllers = [self.dc]
-        #para cada controller na lista de controllers
+        # para cada controller na lista de controllers
         for controller in controllers:
-            #para cada comando e função nos comandos do controlador
+            # para cada comando e função nos comandos do controlador
             for command, function in controller.commands.items():
                 content = context.message.content
                 prefix = context.prefix
                 if content.startswith(prefix+command):
-                    #recebe os argumentos, sem o comando
+                    # recebe os argumentos, sem o comando
                     content = content[len(prefix+command):]
                     args, comment = handleArgs(content)
                     context.setArgs(args, comment)

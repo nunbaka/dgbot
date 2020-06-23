@@ -1,0 +1,13 @@
+{
+    "roll":{
+        "content":"<#author> rolou <#expression>, TOTAL: <#total>",
+        "embed":{
+            "title":"**Rolou um dado e tanto!**",
+            "image-url":"",
+            "description":"<#comment>",
+            "color":16109122,
+            "fields":[]
+        },
+        "reactions":["✅", "⭐"]
+    }
+}
