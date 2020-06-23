@@ -37,7 +37,7 @@ class Client(discord.Client):
         # envia informações da inicialização
         print(f"{self.name} [{self.bot}] - {self.version} init at {cur_time}")
         # informações sobre cada guild
-        for guild in self.guilds:git
+        for guild in self.guilds:
             print(f"\t{guild.name}:{guild.id} connected")
 
     async def on_message(self, message):
