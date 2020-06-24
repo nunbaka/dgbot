@@ -1,8 +1,8 @@
 import discord
 from library import Json, getCurrentTime, existKey
 from context import Context
-from classes import Club, Language
-
+from classes.Language import Language
+from classes.Club import Club
 # user = UserDiscord
 # users = Lista de UserDiscord
 # author = UserDicord Que Enviou a Mensagem
@@ -18,7 +18,7 @@ from classes import Club, Language
 
 class Client(discord.Client):
     def __init__(self):
-        super().__init__()
+        super().__init__() 
         # self.tokens contém os tokens de todos os bots
         self.tokens = Json.loadWrite(pathfile='private/token.json')
         # self.bot contém qual bot está sendo utilizado

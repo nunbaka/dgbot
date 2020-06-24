@@ -31,12 +31,9 @@ class Context:
     async def sendChannel(self, message,
                           **kv) -> (discord.Message):
         try:
-            # recebendo e tratando uma mensagem
-            content = self.getMessage(message['content'], **kv)
-            # criando o embed
-            embed = None
-            if existKey('embed', message):
-                embed = self.getEmbed(message['embed'], **kv)
+            msg = Msg(self, message)
+            content = msg.getContent(**kv)
+            embed = msg.getEmbed(**kv)
             ctx = await self.channel.send(content, embed=embed)
             if existKey("reactions", message):
                 reactions = message['reactions']
@@ -56,10 +53,9 @@ class Context:
                          **kv):
         # o mesmo que sendChannel, porém envia para quem chamou o evento
         try:
-            content = self.getMessage(message['content'], **kv)
-            embed = None
-            if existKey('embed', message):
-                embed = self.getEmbed(message['embed'], **kv)
+            msg = Msg(self, message)
+            content = msg.getContent(**kv)
+            embed = msg.getEmbed(**kv)
             ctx = await self.author.send(content, embed=embed)
             if existKey("reactions", message):
                 reactions = message['reactions']
@@ -68,33 +64,32 @@ class Context:
                         await ctx.add_reaction(reaction)
                     except Exception:
                         pass
+            # retornando a mensagem enviada
+            return ctx
         except Exception:
             # error caso a mensagem esteja mal formatada
             # caso não tenha permissão para enviar mensagem no canal
             return None
 
-    def getMessage(self, message,
-                   total="", expression=""):
-        replaces = {
-            ("<#author>", self.author.mention),
-            ("<#total>", str(total)),
-            ("<#expression>", expression),
-            ("<#comment>", self.comment)
-        }
-        # PARA CADA DUPLA EFETUAR REPLACE
-        for r, v in replaces:
-            message = message.replace(r, v)
-        return message
 
-    def getEmbed(self, embed,
-                 **kv) -> (discord.Embed):
-        # CRIA UM EMBED, TRATANDO AS STRINGS
+class Msg(dict):
+    def __init__(self, context: Context, *v, **kv):
+        self.context = context
+        super().__init__(*v, **kv)
+
+    def getEmbed(self, **kv) -> (discord.Embed):
+        if not existKey("embed", self):
+            return None
+        embed = self['embed']
         if len(list(embed.keys())) == 0:
             return None
-        e = discord.Embed(
-            title=self.getMessage(embed['title'], **kv),
-            description=self.getMessage(embed['description'], **kv),
-            color=embed['color'])
+        e = discord.Embed()
+        if existKey('title', embed):
+            e.title = self.handleMessage(embed['title'], **kv)
+        if existKey('descriprtion', embed):
+            e.description = self.handleMessage(embed['description'], **kv)
+        if existKey('color', embed):
+            e.color = embed['color']
         if existKey("image-url", embed):
             e.set_image(url=embed['image-url'])
         if existKey('fields', embed):
@@ -102,7 +97,30 @@ class Context:
                 inline = True
                 if len(field) == 3:
                     inline = field[2]
-                e.add_field(name=self.getMessage(field[0], **kv),
-                            value=self.getMessage(field[1], **kv),
+                e.add_field(name=self.handleMessage(field[0], **kv),
+                            value=self.handleMessage(field[1], **kv),
                             inline=inline)
         return e
+
+    def getContent(self, **kv):
+        try:
+            if existKey("content", self):
+                string = self.handleMessage(self['content'], **kv)
+                return string
+        except Exception:
+            return ""
+
+    def handleMessage(self, string,
+                      total="", expression="") -> (str):
+        author = self.context.author.mention
+        comment = self.context.comment
+        replaces = {
+            ("<#author>", author),
+            ("<#total>", str(total)),
+            ("<#expression>", expression),
+            ("<#comment>", comment)
+        }
+        # PARA CADA DUPLA EFETUAR REPLACE
+        for r, v in replaces:
+            string = string.replace(r, v)
+        return string

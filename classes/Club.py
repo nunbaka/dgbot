@@ -1,6 +1,6 @@
 import discord
 from library import handleArgs
-from controllers import DiceController
+from controllers.DiceController import DiceController
 
 # COMANDOS ESTÃO EM CONTROLLERS
 
