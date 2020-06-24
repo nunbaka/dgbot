@@ -2,6 +2,7 @@
     "arg_error":{
         "content":"<#author>, os argumentos devem ser números ou dados\n/r (Numero de Dados)d(Faces)"
     },
+    "dice_format":"<#nDices>d<#nFaces>:<#total>",
     "roll":{
         "content":"<#author> rolou <#expression>",
         "embed":{

@@ -1,3 +1,4 @@
+# main
 import discord
 from library import Json, getCurrentTime, existKey
 from context import Context
