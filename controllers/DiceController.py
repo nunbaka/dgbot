@@ -52,6 +52,7 @@ class DiceController:
 
     def getExpression(self, args):
         # TOTAL É A EXPRESSAO SOMENTE COM OS RESULTADOS
+        dice_format = self.strings['dice_format']
         total = ""
         # EXPRESSAO É OS ARGUMENTOS TRABALHADOS
         expression = ""
@@ -72,10 +73,12 @@ class DiceController:
                 # SUBSTITUINDO O ORIGINAL PELO TOTAL
                 total = total.replace(dice, str(roll.total), 1)
                 # SUBSTITUINDO O ORIGINAL PELO TRATADO
+                dicef = dice_format.replace("<#nDices>", str(roll.nDices))
+                dicef = dicef.replace("<#nFaces>", str(roll.nFaces))
+                dicef = dicef.replace("<#dices>", str(roll.dices))
+                dicef = dicef.replace("<#total>", str(roll.total))
                 expression = expression.replace(
-                    dice,
-                    f"{roll.nDices}d{roll.nFaces}, {roll.dices}: {roll.total}",
-                    1)
+                    dice, dicef, 1)
         # CALCULANDO A EXPRESSÃO DE TOTAL ENCONTRADA
         total = eval(total)
         return total, expression
