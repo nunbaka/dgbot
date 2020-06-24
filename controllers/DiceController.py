@@ -74,7 +74,8 @@ class DiceController:
                 # SUBSTITUINDO O ORIGINAL PELO TRATADO
                 expression = expression.replace(
                     dice,
-                    f"{roll.nDices}d{roll.nFaces}, {roll.dices}: {roll.total}", 1)
+                    f"{roll.nDices}d{roll.nFaces}, {roll.dices}: {roll.total}",
+                    1)
         # CALCULANDO A EXPRESSÃO DE TOTAL ENCONTRADA
         total = eval(total)
         return total, expression

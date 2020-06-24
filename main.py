@@ -1,8 +1,7 @@
 import discord
 from library import Json, getCurrentTime, existKey
 from context import Context
-from classes.Club import Club
-from classes.Language import Language
+from classes import Club, Language
 
 # user = UserDiscord
 # users = Lista de UserDiscord
