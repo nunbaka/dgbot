@@ -9,3 +9,4 @@ class Language:
 class Strings:
     def __init__(self, local):
         self.dc = Json.loadWrite(pathfile=local+"DiceController.json")
+        self.lc = Json.loadWrite(pathfile=local+"LibraryController.json")

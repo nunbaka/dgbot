@@ -1,6 +1,7 @@
 import discord
 from library import handleArgs, existKey
 from controllers.DiceController import DiceController
+from controllers.LibraryController import LibraryController
 from classes.Player import Player
 # COMANDOS ESTÃO EM CONTROLLERS
 
@@ -16,9 +17,10 @@ class Club:
         self.guild = guild
         self.strings = strings
         self.dc = DiceController(self)
+        self.lc = LibraryController(self)
 
     async def run(self, context):
-        controllers = [self.dc]
+        controllers = [self.dc, self.lc]
         # para cada controller na lista de controllers
         content = context.message.content
         prefix = context.prefix

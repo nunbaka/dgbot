@@ -7,32 +7,21 @@ from json import loads
 
 
 class Element(dict):
-    def __init__(self, name, description, image_url="", qtd=0):
-        super().__init__()
-        self['id'] = unidecode(str.lower(name))
-        self['name'] = name
-        self['description'] = description
-        self['image_url'] = image_url
-        self['qtd'] = qtd
-        self['msg'] = {
-            "embed": {
-                "title": self['name'],
-                "description": self['description'],
-                "image_url": self['image_url']
-            }
-        }
+    def __init__(self, *v, **kv):
+        super().__init__(*v, **kv)
 
     async def send(self, context: Context):
-        return await context.sendChannel(self['msg'])
+        if existKey('msg', self):
+            return await context.sendChannel(self['msg'])
+        return None
 
 # local termina com barra
 
 
 class DataList(Database):
-    def __init__(self, local="", filename="", maxSize=-1):
+    def __init__(self, local="", filename=""):
         self.local = local
         self.filename = filename
-        self.maxSize = maxSize
         super().__init__(pathfile=local+filename)
 
     def setMaxSize(self, maxSize):
@@ -65,21 +54,14 @@ class DataList(Database):
             return elm
         return None
 
-    def add(self, element: Element) -> (Union[Element, None]):
-        if existKey(element['id'], self):
-            if self.maxSize != -1:
-                if self[element['id']]['qtd'] + element['qtd'] > self.maxSize:
-                    return None
-            self[element['id']]['qtd'] = int(
-                self[element['id']]['qtd'])+int(element['qtd'])
-
-            return element
+    def add(self, _dict) -> (Element):
+        if existKey('qtd', _dict):
+            if existKey(_dict['id'], self):
+                self[_dict['id']]['qtd'] += int(_dict['qtd'])
+                return Element(_dict)
         else:
-            if self.maxSize != -1:
-                if element['qtd'] > self.maxSize:
-                    return None
-            self.update({element['id']: element})
-            return element
+            self.update({_dict['id']: _dict})
+            return Element(_dict)
 
     def getElement(self, _dict) -> (Element):
         e = loads(_dict)
