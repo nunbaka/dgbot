@@ -19,7 +19,7 @@ from classes.Club import Club
 
 class Client(discord.Client):
     def __init__(self):
-        super().__init__() 
+        super().__init__()
         # self.tokens contém os tokens de todos os bots
         self.tokens = Json.loadWrite(pathfile='private/token.json')
         # self.bot contém qual bot está sendo utilizado

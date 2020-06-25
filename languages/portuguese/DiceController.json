@@ -7,7 +7,7 @@
         "content":"<#author> rolou <#expression>",
         "embed":{
             "title":"**Total da rolagem: <#total>**",
-            "image-url":"",
+            "image_url":"",
             "description":"<#comment>",
             "color":16109122,
             "fields":[]

@@ -23,6 +23,9 @@ class Context:
         self.channel = message.channel
         self.users = message.mentions
 
+    def setPlayer(self, player):
+        self.player = player
+
     def setArgs(self, args, comment):
         # setando os argumentos e o comentario do contexto
         self.args = args
@@ -90,8 +93,8 @@ class Msg(dict):
             e.description = self.handleMessage(embed['description'], **kv)
         if existKey('color', embed):
             e.color = embed['color']
-        if existKey("image-url", embed):
-            e.set_image(url=embed['image-url'])
+        if existKey("image_url", embed):
+            e.set_image(url=embed['image_url'])
         if existKey('fields', embed):
             for field in embed['fields']:
                 inline = True
