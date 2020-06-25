@@ -89,12 +89,13 @@ class Msg(dict):
         e = discord.Embed()
         if existKey('title', embed):
             e.title = self.handleMessage(embed['title'], **kv)
-        if existKey('descriprtion', embed):
+        if existKey('description', embed):
             e.description = self.handleMessage(embed['description'], **kv)
         if existKey('color', embed):
             e.color = embed['color']
         if existKey("image_url", embed):
-            e.set_image(url=embed['image_url'])
+            if embed["image_url"]:
+                e.set_image(url=embed['image_url'])
         if existKey('fields', embed):
             for field in embed['fields']:
                 inline = True

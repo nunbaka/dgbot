@@ -1,0 +1,30 @@
+{
+    "mariana": {
+        "id": "mariana",
+        "name": "Mariana",
+        "description": "Arrasa Quarteirão",
+        "image_url": "https://steamuserimages-a.akamaihd.net/ugc/995764246294320390/5E51E3F97ACB5D0419C65329BA942434BF81DA6E/",
+        "qtd": 0,
+        "msg": {
+            "embed": {
+                "title": "Mariana",
+                "description": "Arrasa Quarteirão",
+                "image_url": "https://steamuserimages-a.akamaihd.net/ugc/995764246294320390/5E51E3F97ACB5D0419C65329BA942434BF81DA6E/"
+            }
+        }
+    },
+    "ariel": {
+        "id": "ariel",
+        "name": "Ariel",
+        "description": "Descobridor do Sete Mares",
+        "image_url": "https://i.pinimg.com/originals/bc/8f/89/bc8f898c291c52dabc2aef34a01b8023.jpg",
+        "qtd": 0,
+        "msg": {
+            "embed": {
+                "title": "Ariel",
+                "description": "Descobridor do Sete Mares",
+                "image_url": "https://i.pinimg.com/originals/bc/8f/89/bc8f898c291c52dabc2aef34a01b8023.jpg"
+            }
+        }
+    }
+}

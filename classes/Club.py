@@ -11,7 +11,7 @@ from classes.Player import Player
 class Club:
     def __init__(self, ckey, guild: discord.Guild, strings):
         self.key = ckey
-        #self.players = {}
+        self.players = {}
         self.local = f"Clubs/{self.key}/"
         self.guild = guild
         self.strings = strings
@@ -20,20 +20,27 @@ class Club:
     async def run(self, context):
         controllers = [self.dc]
         # para cada controller na lista de controllers
+        content = context.message.content
+        prefix = context.prefix
         for controller in controllers:
             # para cada comando e função nos comandos do controlador
             for command, function in controller.commands.items():
-                content = context.message.content
-                prefix = context.prefix
-                pKey = str(context.message.author)
-                context.setPlayer(self.getPlayer(pKey))
                 if content.startswith(prefix+command):
                     # recebe os argumentos, sem o comando
                     content = content[len(prefix+command):]
                     args, comment = handleArgs(content)
                     context.setArgs(args, comment)
                     return await function(context)
+        pKey = str(context.message.author.id)
+        context.setPlayer(self.getPlayer(pKey))
+        for command, function in context.player.getCommands().items():
+            if content.startswith(prefix+command):
+                content = content[len(prefix+command):]
+                args, comment = handleArgs(content)
+                context.setArgs(args, comment)
+                return await function(context)
 
     def getPlayer(self, pKey) -> Player:
         if not existKey(pKey, self.players):
             self.players[pKey] = Player(self, pKey)
+        return self.players[pKey]
