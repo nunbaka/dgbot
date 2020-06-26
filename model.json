@@ -1,6 +1,10 @@
 {
-    "id":"",
-    "metadata":{},
+    "name_id":"",
+    "public":false,
+    "unknown":true,
+    "single":true,
+    "rarity":"common",
+    "tags":[],
     "msg":{
         "embed":{
             "title":"",
@@ -10,19 +14,23 @@
             "fields":[]
         },
         "reactions":[]
-    }
+    },
+    "metadata":[]
 }
 {
-    "id":"seu jorge",
-    "metadata":{},
-    "msg":{
-        "embed":{
-            "title":"Seu Jorge",
-            "description":"Ela é amiga da minha mulher",
-            "image_url":"https://i1.sndcdn.com/avatars-000319573979-ov4mo9-t500x500.jpg",
-            "color":0,
-            "fields":[]
+    "msg": {
+        "embed": {
+            "color": 0,
+            "description": "é isso ai, ela é amiga da minha mulher, pois é",
+            "fields": [],
+            "image_url": "",
+            "title": "Jorgin Lendário"
         },
-        "reactions":[]
-    }
+        "reactions": []
+    },
+    "public": true,
+    "rarity": "Comedor de Casadas",
+    "single": true,
+    "tags": [],
+    "unknown": true
 }

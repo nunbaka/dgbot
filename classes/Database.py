@@ -7,4 +7,4 @@ class Database(dict):
         super().__init__(Json.loadWrite(pathfile=pathfile, default=default))
 
     def save(self):
-        Json.write(pathfile=self.pathfile, default=self)
+        Json.write(pathfile=self.pathfile, default=self, sort_keys=True)

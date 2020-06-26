@@ -26,10 +26,11 @@ class Context:
     def setPlayer(self, player):
         self.player = player
 
-    def setArgs(self, args, comment):
+    def setArgs(self, args, comment, club):
         # setando os argumentos e o comentario do contexto
         self.args = args
         self.comment = comment
+        self.club = club
 
     async def sendChannel(self, message,
                           **kv) -> (discord.Message):
@@ -47,7 +48,8 @@ class Context:
                         pass
             # retornando a mensagem enviada
             return ctx
-        except Exception:
+        except Exception as inst:
+            print(inst)
             # error caso a mensagem esteja mal formatada
             # caso não tenha permissão para enviar mensagem no canal
             return None

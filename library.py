@@ -47,7 +47,7 @@ def getCurrentTime():
     return currentDT.strftime("date: %d/%m/%Y, %H:%M:%S")
 
 
-def getKey():
+def getTimeKey():
     currentDT = datetime.datetime.now()
     return currentDT.strftime("%d%H%M%S")
 
@@ -79,7 +79,7 @@ class Json:
                 dump(default, f, indent=4, ensure_ascii=False)
                 return default
 
-    def write(pathfile="", default={}, encoding="utf-8"):
+    def write(pathfile="", default={}, encoding="utf-8", **kv):
         try:
             cur_path = ""
             for path in pathfile.split("/")[:-1]:
@@ -89,7 +89,7 @@ class Json:
                 except Exception:
                     pass
             with open(pathfile, 'w', encoding=encoding) as f:
-                dump(default, f, indent=4, ensure_ascii=False)
+                dump(default, f, indent=4, ensure_ascii=False, **kv)
                 return True
         except IOError:
             print(f"cannot write {pathfile}")

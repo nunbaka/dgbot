@@ -6,7 +6,7 @@ class Player:
         self.club = club
         self.key = pKey
         self.local = f"{club.local}players/{pKey}/"
-        self.inventory = Inventory(self)
+        self.inventory = Inventory(self, club.ic)
         # self.spells = Spell()
 
     def getCommands(self):
