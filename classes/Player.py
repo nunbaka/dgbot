@@ -11,7 +11,7 @@ class Player:
 
     def getCommands(self):
         here = [self.inventory]
-        commands = {}
-        for commands in here:
-            commands.update(self.inventory.commands)
-        return commands
+        cmds = {}
+        for options in here:
+            cmds.update(options.commands)
+        return cmds

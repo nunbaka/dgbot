@@ -1,5 +1,7 @@
-from library import existKey
+''
 import discord
+import asyncio
+from library import existKey
 
 # author = quem enviou a mensagem
 # client = o bot com as informações dele
@@ -130,3 +132,75 @@ class Msg(dict):
         for r, v in replaces:
             string = string.replace(r, v)
         return string
+
+
+class ReactionMsg:
+    def __init__(
+            self, context: Context, pages,
+            reactions={}, timeout=30.0, title=""):
+        self.pages = pages
+        self.page = 0
+        self.numpages = len(pages)
+        self.reactions = {
+            '⏮': self.firstPage,
+            '⏪': self.previousPage,
+            '⏩': self.nextPage,
+            '⏭': self.lastPage
+        }
+        self.context = context
+        self.timeout = timeout
+        self.title = title
+
+    def nextPage(self):
+        self.page += 1
+        if self.page >= self.numpages:
+            self.page = 0
+
+    def previousPage(self):
+        self.page -= 1
+        if self.page < 0:
+            self.page = self.numpages-1
+
+    def lastPage(self):
+        self.page = self.numpages
+
+    def firstPage(self):
+        self.page = 0
+
+    def addReactions(self, reactions):
+        self.reactions.update(reactions)
+
+    def setReactions(self, reactions):
+        self.reactions = reactions
+
+    async def send(self):
+        channel = self.context.channel
+        self.ctx = await channel.send(self.title+self.pages[self.page])
+        for react in list(self.reactions.keys()):
+            await self.ctx.add_reaction(react)
+        await self.waitReaction()
+        return self.ctx
+
+    def check(self, reaction, user):
+        author = self.context.author
+        if user == author and existKey(reaction.emoji, self.reactions):
+            return True
+        return False
+
+    async def waitReaction(self):
+        client = self.context.client
+        author = self.context.author
+        while True:
+            try:
+                reaction, user = await client.wait_for(
+                    'reaction_add',
+                    timeout=self.timeout,
+                    check=self.check)
+                if user == author:
+                    self.reactions[reaction.emoji]()
+            except asyncio.TimeoutError:
+                await self.ctx.clear_reactions()
+                return False
+            else:
+                await self.ctx.remove_reaction(reaction.emoji, author)
+                await self.ctx.edit(content=self.title+self.pages[self.page])

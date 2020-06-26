@@ -2,43 +2,86 @@ from library import existKey, getTimeKey
 from classes.Database import Database
 from unidecode import unidecode
 from classes.DataList import Element
+from context import ReactionMsg
 
 
-class Inventory(dict):
+# classe de inventario
+# contém listas pre definidas de armazenamento de itens
+# não contém protocolo para aceitar dados
+# tem função show, função iv
+# função show procura no item controller o item
+# se o item não for publico ele printa se somente se tiver o item
+# função iv printa o que esté no inventário
+
+# player contém o player dono do inventário
+# self.ic contém o item controller
+# stack, singles
+# stacks contém a referncia de itens que existe no item controller
+# singles contém itens unicos
+
+class Inventory:
     def __init__(self, player, ic):
-        super().__init__()
         self.player = player
         self.ic = ic
-        self["stacks"] = Database(
+        # dict de itens stackaveis
+        self.stacks = Database(
             pathfile=player.local+"stacks.json")
-        self["singles"] = Database(
+        # dict de itens não stackaveis
+        self.singles = Database(
             pathfile=player.local+"singles.json")
+        # comandos para esta classe
         self.commands = {
             "show": self.showItem,
             "iv": self.sendInventory
         }
 
+    def getPages(self):
+        # retorna uma lista de páginas que conténdo o inventario
+        stackPages = []
+        i = 0
+        text = "```Itens```"
+        # para cada item crie uma string e adicione ao texto
+        for name_id, item in self.stacks.items():
+            text += f"\t{i} - {item['title']}, x{item['qtd']}\n"
+            i += 1
+            if (i+1) % 10 == 0:
+                # se deu 10 elementos crie uma página
+                stackPages.append(text)
+                text = ""
+        if len(text) > 0:
+            stackPages.append(text)
+        singlePages = []
+        i = 0
+        text = "```Itens Unicos```"
+        # para cada item crie uma string e adicione ao texto
+        for name_id, item in self.singles.items():
+            text += f"\t{i} - {item['msg']['embed']['title']}, id: `{name_id}`\n"
+            i += 1
+            if (i) % 5 == 0:
+                # se deu 10 elementos crie uma página
+                i = 0
+                singlePages.append(text)
+                text = ""
+        if len(text) > 0:
+            singlePages.append(text)
+        return stackPages, singlePages
+
     async def sendInventory(self, context):
-        text = "```Items```"
-        for name_id, item in self['stacks'].items():
-            text += f"{item['title']} x{item['qtd']}\n"
-        text += "\n```Items Únicos```"
-        for name_id, item in self['singles'].items():
-            e = item['msg']['embed']
-            text += f"{e['title']}, id: {name_id}\n"
-        await context.channel.send(text)
+        stackPages, singlePages = self.getPages()
+        rm = ReactionMsg(context, stackPages+singlePages, title="Inventário\n")
+        await rm.send()
 
     async def showItem(self, context):
         name_id = " ".join(context.args)
         name_id = unidecode(str.lower(name_id))
         a = self.ic.get(name_id)
         if not a:
-            if existKey(name_id, self['singles']):
-                item = Element(self['singles'][name_id])
+            if existKey(name_id, self.singles):
+                item = Element(self.singles[name_id])
                 return await item.send(context)
             await context.channel.send("No Exist")
             return None
-        if existKey(name_id, self['stacks']):
+        if existKey(name_id, self.stacks):
             return await a.send(context)
         if a['public']:
             return await a.send(context)
@@ -46,19 +89,23 @@ class Inventory(dict):
 
     def add(self, item, qtd):
         if existKey("single", item):
+            # verificando se existe a tag de single
             if item['single']:
+                # existe verifica se é verdadeira
                 key = getTimeKey()
                 e = item['msg']['embed']
                 name_id = str.lower(unidecode(f"{e['title']}:{key}"))
-                self['singles'][name_id] = item
-                self['singles'].save()
+                self.singles[name_id] = item
+                self.singles.save()
                 return True
+        # caso não seja um item single, pega só a refernecia
         item = item.getRef(qtd=qtd)
         name_id = str(unidecode(item['title']))
-        if existKey(name_id, self['stacks']):
-            self['stacks'][name_id]['qtd'] += item['qtd']
-            if self['stacks'][name_id]['qtd'] == 0:
-                del self['stacks'][name_id]
+        if existKey(name_id, self.stacks):
+            self.stacks[name_id]['qtd'] += item['qtd']
+            if self.stacks[name_id]['qtd'] == 0:
+                del self.stacks[name_id]
         else:
-            self['stacks'][name_id] = item
-        self['stacks'].save()
+            self.stacks[name_id] = item
+        self.stacks.save()
+        return True
