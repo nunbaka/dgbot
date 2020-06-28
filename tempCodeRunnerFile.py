@@ -1,2 +1,2 @@
-
-    def getLanguage(self, guil
+ foi enviada em uma guild
+            return

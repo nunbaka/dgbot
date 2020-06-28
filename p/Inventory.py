@@ -1,4 +1,4 @@
-from library import existKey, getTimeKey, RD
+from library import existKey, getTimeKey, RD, IRD
 from classes.Database import Database
 from unidecode import unidecode
 from classes.DataList import Element
@@ -51,36 +51,42 @@ class Inventory:
         if len(text) > 0:
             stackPages.append(text)
         singlePages = []
+        itemPages = []
+        singleItems = []
         i = 1
         text = "```Itens Unicos```"
         # para cada item crie uma string e adicione ao texto
         for name_id, item in self.singles.items():
             text += f"{RD[str(i)]} - {item['msg']['embed']['title']}, id: `{name_id}`\n"
+            singleItems.append(name_id)
             i += 1
             if (i-1) % 5 == 0:
                 # se deu 10 elementos crie uma página
                 i = 1
                 singlePages.append(text)
+                itemPages.append(singleItems)
+                singleItems = []
                 text = ""
         if len(text) > 0:
             singlePages.append(text)
-        return stackPages, singlePages
+        return stackPages, singlePages, itemPages
 
     async def sendInventory(self, context):
         async def cmd(reaction, user):
             print(f"{user.name} reacting with {reaction.emoji}")
-        stackPages, singlePages = self.getPages()
+        stackPages, singlePages, singleItems = self.getPages()
         rm = PageMessage(context, stackPages+singlePages, cmd=cmd)
-        rm.reactions = [
-            '⏪',
-            '1️⃣',
-            '2️⃣',
-            '3️⃣',
-            '4️⃣',
-            '5️⃣',
-            '⏩']
+        rm.reactions = ['⏪',
+                        '1️⃣',
+                        '2️⃣',
+                        '3️⃣',
+                        '4️⃣',
+                        '5️⃣',
+                        '⏩']
+        pagesStack = len(stackPages)
         commands = {'⏪': rm.previousPage, '⏩': rm.nextPage}
         await rm.send()
+        messages = []
         while True:
             try:
                 reaction, user = await rm.wait_reaction()
@@ -95,10 +101,21 @@ class Inventory:
                     continue
                 if rm.content.find(emoji) == -1:
                     continue
-                text = rm.content[rm.content.find(emoji):]
-                text = text[text.find("id: ")+len("id: "):]
-                text = text[:text.find('\n')]
-                print(text)
+                index = unidecode(IRD[emoji])[:-3]
+                index = int(index)-1
+                page = rm.page - pagesStack
+                if page < 0:
+                    continue
+                name_id = singleItems[page][index]
+                context.setArgs(name_id.split(),
+                                context.comment,
+                                context.club)
+                ctx = await self.showItem(context)
+                for message in messages:
+                    await message.delete()
+                    messages.remove(message)
+                    del message
+                messages.append(ctx)
             except Exception as inst:
                 print(inst)
                 return
