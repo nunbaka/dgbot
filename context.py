@@ -134,73 +134,109 @@ class Msg(dict):
         return string
 
 
-class ReactionMsg:
-    def __init__(
-            self, context: Context, pages,
-            reactions={}, timeout=30.0, title=""):
-        self.pages = pages
+class ReactionMessage:
+    def __init__(self, context, public=True, reactions=[]):
+        self.embed = ""
+        self.ctx = None
+        self.content = ""
+        self.public = public
+        self.context = context
+        self.reacts = []
+        self.reactions = reactions
+
+    def setCommands(self, commands):
+        self.commands = commands
+        self.reactions = list(commands.keys())
+
+    async def add_reactions(self):
+        try:
+            for reaction in self.reactions:
+                await self.ctx.add_reaction(reaction)
+        except Exception:
+            pass
+
+    async def send(self):
+        channel = self.context.channel
+        self.ctx = await channel.send(self.content)
+        await self.add_reactions()
+        return self.ctx
+
+    async def updateMessage(self):
+        await self.ctx.edit(content=self.content)
+
+    async def wait_reaction(self, timeout=15):
+        client = self.context.client
+        try:
+            reaction, user = await client.wait_for(
+                'reaction_add',
+                timeout=timeout,
+                check=self.check)
+            return reaction, user
+        except asyncio.TimeoutError:
+            await self.ctx.clear_reactions()
+            return False
+        else:
+            if not self.public:
+                await self.ctx.remove_reaction(reaction.emoji, user)
+
+    def check(self, reaction, user):
+        if reaction.emoji in self.reactions:
+            if user != self.context.client.user:
+                return True
+        return False
+
+
+class PageMessage(ReactionMessage):
+    def __init__(self, context, pages=[], title='', *v, **kv):
         self.page = 0
-        self.numpages = len(pages)
-        self.reactions = {
+        self.pages = pages
+        self.title = title
+        self.nPages = len(pages)
+        super().__init__(context, *v, *kv)
+        self.setCommands({
             '⏮': self.firstPage,
             '⏪': self.previousPage,
             '⏩': self.nextPage,
             '⏭': self.lastPage
-        }
-        self.context = context
-        self.timeout = timeout
-        self.title = title
+        })
 
-    def nextPage(self):
-        self.page += 1
-        if self.page >= self.numpages:
-            self.page = 0
+    async def updateMessage(self):
+        self.content = self.title + self.pages[self.page]
+        await super().updateMessage()
 
-    def previousPage(self):
+    async def firstPage(self):
+        self.page = 0
+        await self.updateMessage()
+
+    async def lastPage(self):
+        self.page = self.nPages - 1
+        await self.updateMessage()
+
+    async def previousPage(self):
         self.page -= 1
         if self.page < 0:
-            self.page = self.numpages-1
+            self.page = self.nPages-1
+        await self.updateMessage()
 
-    def lastPage(self):
-        self.page = self.numpages
-
-    def firstPage(self):
-        self.page = 0
-
-    def addReactions(self, reactions):
-        self.reactions.update(reactions)
-
-    def setReactions(self, reactions):
-        self.reactions = reactions
+    async def nextPage(self):
+        self.page += 1
+        if self.page >= self.nPages:
+            self.page = 0
+        await self.updateMessage()
 
     async def send(self):
-        channel = self.context.channel
-        self.ctx = await channel.send(self.title+self.pages[self.page])
-        for react in list(self.reactions.keys()):
-            await self.ctx.add_reaction(react)
-        await self.waitReaction()
-        return self.ctx
+        self.content = self.pages[0]
+        self.ctx = await super().send()
 
-    def check(self, reaction, user):
-        author = self.context.author
-        if user == author and existKey(reaction.emoji, self.reactions):
-            return True
-        return False
-
-    async def waitReaction(self):
-        client = self.context.client
-        author = self.context.author
+    async def runReaction(self):
         while True:
             try:
-                reaction, user = await client.wait_for(
-                    'reaction_add',
-                    timeout=self.timeout,
-                    check=self.check)
-                if user == author:
-                    self.reactions[reaction.emoji]()
-            except asyncio.TimeoutError:
-                await self.ctx.clear_reactions()
-                return False
-            else:
-                await self.ctx.remove_reaction(reaction.emoji, author)
-                await self.ctx.edit(content=self.title+self.pages[self.page])
+                reaction, user = await self.wait_reaction()
+                if user == self.context.author:
+                    await self.ctx.remove_reaction(reaction.emoji, user)
+                    function = self.commands[reaction.emoji]
+                    if function:
+                        await function()
+            except Exception as inst:
+                print(inst)
+                return self.ctx

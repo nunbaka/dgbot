@@ -1,2 +1,2 @@
-sagem é do proprio bot
-            return
+
+    def getLanguage(self, guil
