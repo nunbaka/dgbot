@@ -1,0 +1,11 @@
+{
+    "give_success":{
+        "content":"<#author>, <#user> recebeu <#title> x<#qtd>"
+    },
+    "give_fail":{
+        "content":"<#author>, <#user> não pode receber <#title>"
+    },
+    "noItem_error":{
+        "content":"<#author>, item não encontrado"
+    }
+}

@@ -9,4 +9,5 @@ class Language:
 class Strings:
     def __init__(self, local):
         self.dc = Json.loadWrite(pathfile=local+"DiceController.json")
-        self.lc = Json.loadWrite(pathfile=local+"LibraryController.json")
+        self.ic = Json.loadWrite(pathfile=local+"ItemController.json")
+        self.p = Json.loadWrite(pathfile=local+"Player.json")

@@ -1,0 +1,10 @@
+{
+    "inventory":{
+        "noItem_error":{
+            "content":"<#author>\n O item <#title> não existe."
+        },
+        "noPublicItem":{
+            "content":"<#author>\n Você não tem informações sobre este item"
+        }
+    }
+}

@@ -2,7 +2,7 @@ from library import existKey, getTimeKey, RD, IRD
 from classes.Database import Database
 from unidecode import unidecode
 from classes.DataList import Element
-from context import PageMessage
+from classes.Interface.ReactionMessage import PageMessage
 
 
 # classe de inventario
@@ -23,6 +23,7 @@ class Inventory:
     def __init__(self, player, ic):
         self.player = player
         self.ic = ic
+        self.strings = player.strings['inventory']
         # dict de itens stackaveis
         self.stacks = Database(
             pathfile=player.local+"stacks.json")
@@ -72,34 +73,22 @@ class Inventory:
         return stackPages, singlePages, itemPages
 
     async def sendInventory(self, context):
-        async def cmd(reaction, user):
-            print(f"{user.name} reacting with {reaction.emoji}")
         stackPages, singlePages, singleItems = self.getPages()
-        rm = PageMessage(context, stackPages+singlePages, cmd=cmd)
-        rm.reactions = ['⏪',
-                        '1️⃣',
-                        '2️⃣',
-                        '3️⃣',
-                        '4️⃣',
-                        '5️⃣',
-                        '⏩']
+        rm = PageMessage(context, stackPages+singlePages)
         pagesStack = len(stackPages)
-        commands = {'⏪': rm.previousPage, '⏩': rm.nextPage}
-        await rm.send()
+        await rm.sendChannel()
+        rm.reactions = ['⏪', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '⏩']
+        await rm.add_reactions()
         messages = []
+        commands = {'⏪': rm.previousPage, '⏩': rm.nextPage}
         while True:
             try:
                 reaction, user = await rm.wait_reaction()
                 emoji = reaction.emoji
-                if not (emoji in rm.reactions):
-                    continue
-                if not user == context.author:
-                    continue
                 await rm.ctx.remove_reaction(emoji, user)
                 if existKey(emoji, commands):
-                    await commands[emoji]()
-                    continue
-                if rm.content.find(emoji) == -1:
+                    commands[emoji]()
+                    await rm.updateMessage()
                     continue
                 index = unidecode(IRD[emoji])[:-3]
                 index = int(index)-1
@@ -110,41 +99,55 @@ class Inventory:
                 context.setArgs(name_id.split(),
                                 context.comment,
                                 context.club)
-                ctx = await self.showItem(context)
                 for message in messages:
                     await message.delete()
                     messages.remove(message)
                     del message
+                ctx = await self.showItem(context)
                 messages.append(ctx)
             except Exception as inst:
                 print(inst)
                 return
 
     async def showItem(self, context):
-        name_id = " ".join(context.args)
-        name_id = unidecode(str.lower(name_id))
-        a = self.ic.get(name_id)
-        if not a:
+        # inst strings
+        s = self.strings
+        # get title from args
+        title = " ".join(context.args)
+        # get id
+        name_id = unidecode(str.lower(title))
+        # get item dict
+        item = self.ic.get(name_id)
+        if not item:
+            # caso item não encontrado
             if existKey(name_id, self.singles):
+                # se existir em itens unicos
                 item = Element(self.singles[name_id])
                 return await item.send(context)
-            await context.channel.send("No Exist")
+            # em caso de não existir o item
+            await context.sendChannel(
+                s['noItem_error'], title=title)
             return None
         if existKey(name_id, self.stacks):
-            return await a.send(context)
-        if a['public']:
-            return await a.send(context)
-        return await context.channel.send("No Public")
+            # se tem o item no inventário
+            return await item.send(context)
+        if item['public']:
+            # se o item for publico
+            return await item.send(context)
+        # se o item não for publico
+        return await context.sendChannel(
+            s['noPublicItem'], title=title)
 
     def add(self, item, qtd):
         if existKey("single", item):
             # verificando se existe a tag de single
             if item['single']:
                 # existe verifica se é verdadeira
-                key = getTimeKey()
-                e = item['msg']['embed']
-                name_id = str.lower(unidecode(f"{e['title']}:{key}"))
-                self.singles[name_id] = item
+                for i in range(qtd):
+                    key = getTimeKey()
+                    e = item['msg']['embed']
+                    name_id = str.lower(unidecode(f"{e['title']}:{key}{i}"))
+                    self.singles[name_id] = item
                 self.singles.save()
                 return True
         # caso não seja um item single, pega só a refernecia

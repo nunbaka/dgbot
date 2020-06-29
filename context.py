@@ -1,4 +1,3 @@
-''
 import discord
 import asyncio
 from library import existKey
@@ -118,125 +117,27 @@ class Msg(dict):
         except Exception:
             return ""
 
-    def handleMessage(self, string,
-                      total="", expression="") -> (str):
+    def handleMessage(
+        self, string,
+        total="",
+        expression="",
+        title="",
+        user="",
+        qtd=0,
+    ) -> (str):
         author = self.context.author.mention
         comment = self.context.comment
         replaces = {
             ("<#author>", author),
             ("<#total>", str(total)),
             ("<#expression>", expression),
-            ("<#comment>", comment)
+            ("<#comment>", comment),
+            ("<#title>", title),
+            ("<#user>", user),
+            ("<#qtd>", str(qtd))
+
         }
         # PARA CADA DUPLA EFETUAR REPLACE
         for r, v in replaces:
             string = string.replace(r, v)
         return string
-
-
-class ReactionMessage:
-    def __init__(self, context, public=True, reactions=[]):
-        self.embed = ""
-        self.ctx = None
-        self.content = ""
-        self.public = public
-        self.context = context
-        self.reacts = []
-        self.reactions = reactions
-
-    def setCommands(self, commands):
-        self.commands = commands
-        self.reactions = list(commands.keys())
-
-    async def add_reactions(self):
-        try:
-            for reaction in self.reactions:
-                await self.ctx.add_reaction(reaction)
-        except Exception:
-            pass
-
-    async def send(self):
-        channel = self.context.channel
-        self.ctx = await channel.send(self.content)
-        await self.add_reactions()
-        return self.ctx
-
-    async def updateMessage(self):
-        await self.ctx.edit(content=self.content)
-
-    async def wait_reaction(self, timeout=15):
-        client = self.context.client
-        try:
-            reaction, user = await client.wait_for(
-                'reaction_add',
-                timeout=timeout,
-                check=self.check)
-            return reaction, user
-        except asyncio.TimeoutError:
-            await self.ctx.clear_reactions()
-            return False
-        else:
-            if not self.public:
-                await self.ctx.remove_reaction(reaction.emoji, user)
-
-    def check(self, reaction, user):
-        if reaction.emoji in self.reactions:
-            if user != self.context.client.user:
-                return True
-        return False
-
-
-class PageMessage(ReactionMessage):
-    def __init__(self, context, pages=[], title='', *v, **kv):
-        self.page = 0
-        self.pages = pages
-        self.title = title
-        self.nPages = len(pages)
-        super().__init__(context, *v, *kv)
-        self.setCommands({
-            '⏮': self.firstPage,
-            '⏪': self.previousPage,
-            '⏩': self.nextPage,
-            '⏭': self.lastPage
-        })
-
-    async def updateMessage(self):
-        self.content = self.title + self.pages[self.page]
-        await super().updateMessage()
-
-    async def firstPage(self):
-        self.page = 0
-        await self.updateMessage()
-
-    async def lastPage(self):
-        self.page = self.nPages - 1
-        await self.updateMessage()
-
-    async def previousPage(self):
-        self.page -= 1
-        if self.page < 0:
-            self.page = self.nPages-1
-        await self.updateMessage()
-
-    async def nextPage(self):
-        self.page += 1
-        if self.page >= self.nPages:
-            self.page = 0
-        await self.updateMessage()
-
-    async def send(self):
-        self.content = self.pages[0]
-        self.ctx = await super().send()
-
-    async def runReaction(self):
-        while True:
-            try:
-                reaction, user = await self.wait_reaction()
-                if user == self.context.author:
-                    await self.ctx.remove_reaction(reaction.emoji, user)
-                    function = self.commands[reaction.emoji]
-                    if function:
-                        await function()
-            except Exception as inst:
-                print(inst)
-                return self.ctx
