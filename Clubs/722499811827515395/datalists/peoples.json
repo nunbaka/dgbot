@@ -1,0 +1,96 @@
+{
+    "ana carolina": {
+        "msg": {
+            "embed": {
+                "color": 0,
+                "description": "É isso aiiiiii!",
+                "fields": [],
+                "image_url": "",
+                "title": "Ana carolina"
+            },
+            "reactions": []
+        },
+        "public": true,
+        "tags": [],
+        "unknown": false
+    },
+    "ariel": {
+        "msg": {
+            "embed": {
+                "color": 0,
+                "description": "O gatenho da mesa",
+                "fields": [],
+                "image_url": "",
+                "title": "Ariel"
+            },
+            "reactions": []
+        },
+        "public": false,
+        "tags": [],
+        "unknown": false
+    },
+    "jorgin": {
+        "msg": {
+            "embed": {
+                "color": 0,
+                "description": "é isso ai, ela é amiga da minha mulher, pois é",
+                "fields": [],
+                "image_url": "",
+                "title": "Jorgin"
+            },
+            "reactions": []
+        },
+        "public": true,
+        "rarity": "Comedor de Casadas",
+        "tags": [],
+        "unknown": true
+    },
+    "jorgin lendario": {
+        "msg": {
+            "embed": {
+                "color": 0,
+                "description": "é isso ai, ela é amiga da minha mulher, pois é",
+                "fields": [],
+                "image_url": "",
+                "title": "Jorgin Lendário"
+            },
+            "reactions": []
+        },
+        "public": true,
+        "rarity": "Comedor de Casadas",
+        "single": true,
+        "tags": [],
+        "unknown": true
+    },
+    "mariana": {
+        "msg": {
+            "embed": {
+                "color": 0,
+                "description": "A gatenha da mesa",
+                "fields": [],
+                "image_url": "",
+                "title": "Mariana"
+            },
+            "reactions": []
+        },
+        "public": true,
+        "tags": [],
+        "unknown": true
+    },
+    "seu jorge": {
+        "msg": {
+            "embed": {
+                "color": 0,
+                "description": "é isso ai, ela é amiga da minha mulher, pois é",
+                "fields": [],
+                "image_url": "",
+                "title": "Seu Jorge"
+            },
+            "reactions": []
+        },
+        "public": true,
+        "rarity": "Comedor de Casadas",
+        "tags": [],
+        "unknown": true
+    }
+}

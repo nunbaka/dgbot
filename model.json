@@ -1,0 +1,36 @@
+{
+    "name_id":"",
+    "public":false,
+    "unknown":true,
+    "single":true,
+    "rarity":"common",
+    "tags":[],
+    "msg":{
+        "embed":{
+            "title":"",
+            "description":"",
+            "image_url":"",
+            "color":0,
+            "fields":[]
+        },
+        "reactions":[]
+    },
+    "metadata":[]
+}
+{
+    "msg": {
+        "embed": {
+            "color": 0,
+            "description": "é isso ai, ela é amiga da minha mulher, pois é",
+            "fields": [],
+            "image_url": "",
+            "title": "Jorgin Lendário"
+        },
+        "reactions": []
+    },
+    "public": true,
+    "rarity": "Comedor de Casadas",
+    "single": true,
+    "tags": [],
+    "unknown": true
+}
