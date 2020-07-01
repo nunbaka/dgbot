@@ -55,7 +55,7 @@ class Inventory:
         itemPages = []
         singleItems = []
         i = 1
-        text = "```Itens Unicos```"
+        text = "```Itens Únicos```"
         # para cada item crie uma string e adicione ao texto
         for name_id, item in self.singles.items():
             text += f"{RD[str(i)]} - {item['msg']['embed']['title']}, id: `{name_id}`\n"
@@ -95,7 +95,10 @@ class Inventory:
                 page = rm.page - pagesStack
                 if page < 0:
                     continue
-                name_id = singleItems[page][index]
+                try:
+                    name_id = singleItems[page][index]
+                except Exception:
+                    continue
                 context.setArgs(name_id.split(),
                                 context.comment,
                                 context.club)

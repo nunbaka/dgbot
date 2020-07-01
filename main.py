@@ -16,8 +16,29 @@ from classes.Club import Club
 # club = Nosso tipo de dado que representa a guild
 # clubs, uma lista de clubs
 
+    # +Club:
+    #     +Armazenamento de players
+    #         +GetPlayer user
+    #     +Armazenamento de items
+    #         +give @user name_id qtd=1 / to player
+    #         +list datalist / view a datalist of items
+    #         +new datalist / add a new datalist
+    #         +add datalist #item/ add a item on datalist
+    #         -del datalist / delete a datalist
+    #         -remove datalist item / remove item from datalist
+    #     -Armazenamento de terrenos
+        
+    #     +Controle de Dados
+    #         +roll dice
+    # +Player:
+    #     +Inventory:
+    #         +iv / show all inventory
+    #         +show name_id / show item
+    #     -Skill:
+    #         -name_skill / use the skill
 
-class Client(discord.Client):
+
+Client(discord.Client):
     def __init__(self):
         super().__init__()
         # self.tokens contém os tokens de todos os bots
