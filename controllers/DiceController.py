@@ -25,7 +25,7 @@ class DiceController:
         self.club = club
         self.strings = self.club.strings.dc
         self.commands = {
-            'r': self.r
+            'r ': self.r
         }
 
     async def r(self, context: Context):

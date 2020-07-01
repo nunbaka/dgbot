@@ -7,9 +7,8 @@ from json import loads
 
 
 class Element(dict):
-    def __init__(self, _dict={}, datalist=""):
-        super().__init__(_dict)
-        self.datalist = datalist
+    def __init__(self, elm_dict={}):
+        super().__init__(elm_dict)
 
     async def send(self, context: Context):
         msg = self['msg']
@@ -60,10 +59,10 @@ class DataList(Database):
         self[name_id] = _dict
         return Element(_dict)
 
-    def add(self, _dict) -> (Element):
-        name_id = str.lower(unidecode(_dict['msg']['embed']['title']))
-        self.update({name_id: _dict})
-        return Element(_dict)
+    def add(self, elm_dict) -> (Element):
+        elm_id = str.lower(unidecode(elm_dict['msg']['embed']['title']))
+        self.update({elm_id: elm_dict})
+        return Element(elm_dict)
 
 
 class RefList(DataList):
