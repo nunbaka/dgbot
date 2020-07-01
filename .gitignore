@@ -4,3 +4,4 @@
 .mypy_cache
 /controllers/__pycache__
 /.vscode
+/classes/Interface/__pycache__/
