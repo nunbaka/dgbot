@@ -1,5 +1,5 @@
 from classes.Catalog import Library, Catalog
-
+from unidecode import unidecode
 
 class ItemController(Library):
     def __init__(self, club):
@@ -14,6 +14,7 @@ class ItemController(Library):
             "items": self.send_catalog,
             "give item ": self.give,
         }
+              
     async def give(self, context):
         # argumentos:
         # @user item_name qtd
@@ -40,9 +41,8 @@ class ItemController(Library):
         # ao chegar aqui significa que os argumentos foram minimamente informados
         try:
             elm, datalist_id = self.get_element_by_name(elm_name)
+            player.inventory.add_element(elm, datalist_id)
         except Exception:
             print("Elemento inexistente")
             return None
-        if elm.isSingle():
-            player.inventory.add_element('single', elm)
         

@@ -169,6 +169,7 @@ class Library(Catalog):
                 s['success'],
                 title=datalist_name)
         return None
+
     async def del_datalist(self, context):
         # cria uma nova datalist
         s = self.strings['del_datalist']

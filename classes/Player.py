@@ -1,4 +1,5 @@
 from classes.player.ItemStorage import ItemStorage
+from classes.player.Inventory import Inventory
 
 class Player:
     def __init__(self, club, pKey):
@@ -6,7 +7,8 @@ class Player:
         self.strings = self.club.strings.p
         self.key = pKey
         self.local = f"{club.local}players/{pKey}/"
-        self.inventory = ItemStorage(self, name="inventory")
+        self.inventory = Inventory(
+            local=self.local, filename="inventory.json")
         # self.spells = Spell()
 
     def getCommands(self):

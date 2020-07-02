@@ -19,6 +19,12 @@ class Element(dict):
             return await context.sendChannel(msg)
         return None
 
+    def getName(self):
+        try:
+            return self['msg']['embed']['title']
+        except Exception:
+            return None
+
     def isSingle(self):
         if existKey('single', self):
             return self['single']
@@ -40,18 +46,26 @@ class Datalist(Database):
     def getSize(self):
         return len(list(self.keys()))
 
-    def get(self, title) -> (Union[Element, None]):
-        name_id = unidecode(str.lower(title))
-        if existKey(name_id, self):
-            return Element(self[name_id], self.filename)
+    def get_element(self, elm_name) -> (Element):
+        elm_id = unidecode(str.lower(elm_name))
+        if existKey(elm_id, self):
+            return Element(self[elm_id])
         return None
 
-    def set(self, _dict) -> (Element):
-        name_id = str.lower(unidecode(_dict['msg']['embed']['title']))
-        self[name_id] = _dict
-        return Element(_dict)
+    def add_element(self, elm_dict) -> (Element):
+        try:
+            elm_id = str.lower(unidecode(elm_dict['msg']['embed']['title']))
+            self.update({elm_id: elm_dict})
+            return Element(elm_dict)
+        except Exception:
+            return None
 
-    def add(self, elm_dict) -> (Element):
-        elm_id = str.lower(unidecode(elm_dict['msg']['embed']['title']))
-        self.update({elm_id: elm_dict})
-        return Element(elm_dict)
+    def remove_element(self, elm_name) -> (Element):
+        elm_id = unidecode(str.lower(elm_name))
+        if existKey(elm_id, self):
+            elm = Element(self[elm_id])
+            del self[elm_id]
+            return elm
+        return None
+
+    def exist_element(self, elm_name) -> (Element):
