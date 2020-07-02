@@ -6,12 +6,10 @@ class Player:
         self.strings = self.club.strings.p
         self.key = pKey
         self.local = f"{club.local}players/{pKey}/"
-        self.inventory = ItemStorage(self, club.ic)
+        self.inventory = ItemStorage(self, name="inventory")
         # self.spells = Spell()
 
     def getCommands(self):
-        here = [self.inventory]
         cmds = {}
-        for options in here:
-            cmds.update(options.commands)
         return cmds
+

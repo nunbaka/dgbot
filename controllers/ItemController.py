@@ -12,7 +12,7 @@ class ItemController(Library):
             "remove item ": self.remove_element,
             "del item list ": self.del_datalist,
             "items": self.send_catalog,
-            "give item ": self.give
+            "give item ": self.give,
         }
     async def give(self, context):
         # argumentos:

@@ -43,7 +43,7 @@ class Catalog(dict):
             local=self.master.local+self.name+"/", filename=datalist_id)
         self.datalists[datalist_id] = datalist_name
         self.datalists.save()
-        return self[datalist_id]
+        return True
 
     def del_datalist(self, datalist_name: str) -> (Datalist):
         datalist_id = unidecode(str.lower(datalist_name))
@@ -52,7 +52,7 @@ class Catalog(dict):
             del self[datalist_id]
             del self.datalists[datalist_id]
             self.datalists.save()
-            return datalist
+            return True
         return None
 
     def get_element(self, datalist_name: str, elm_name: str) -> (Element):
@@ -163,25 +163,25 @@ class Library(Catalog):
         s = self.strings['new_datalist']
         # recebe o nome da datalist
         datalist_name = " ".join(context.args)
-        datalist = super().new_datalist(datalist_name)
-        print(datalist)
-        return await context.sendChannel(
-            s['success'],
-            title=datalist_name)
-        
+        success = super().new_datalist(datalist_name)
+        if success:
+            return await context.sendChannel(
+                s['success'],
+                title=datalist_name)
+        return None
     async def del_datalist(self, context):
         # cria uma nova datalist
         s = self.strings['del_datalist']
         # cria uma nova datalist
         datalist_name = " ".join(context.args)
-        datalist = super().del_datalist(datalist_name)
-        if datalist:
+        success = super().del_datalist(datalist_name)
+        if success:
             # em caso de sucesso
             return await context.sendChannel(
                 s['success'],
                 title=datalist_name)
         # não existir datalist
-        context.sendChannel(
+        await context.sendChannel(
             s['no_datalist_fail'],
             title= datalist_name)
         return None

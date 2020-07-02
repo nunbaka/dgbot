@@ -29,7 +29,7 @@
     },
     "del_datalist":{
         "success":{
-            "content":"<#author>, a datalist <#title> foi criada com sucesso!"
+            "content":"<#author>, a datalist <#title> foi apagada!"
         },
         "no_datalist_fail":{
             "content":"<#author>, a datalist <#title> não existe!"

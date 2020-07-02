@@ -36,3 +36,22 @@ class Datalist(Database):
         self.local = local
         self.filename = filename
         super().__init__(pathfile=local+filename+".json")
+
+    def getSize(self):
+        return len(list(self.keys()))
+
+    def get(self, title) -> (Union[Element, None]):
+        name_id = unidecode(str.lower(title))
+        if existKey(name_id, self):
+            return Element(self[name_id], self.filename)
+        return None
+
+    def set(self, _dict) -> (Element):
+        name_id = str.lower(unidecode(_dict['msg']['embed']['title']))
+        self[name_id] = _dict
+        return Element(_dict)
+
+    def add(self, elm_dict) -> (Element):
+        elm_id = str.lower(unidecode(elm_dict['msg']['embed']['title']))
+        self.update({elm_id: elm_dict})
+        return Element(elm_dict)

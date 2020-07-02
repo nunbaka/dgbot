@@ -41,7 +41,7 @@ from classes.Club import Club
             -terrain @terrain / Show Stats of Terrain
             -Shop:
                 -shop / view the shop catalog
-                -buy name_id qtd = 1 / buy item
+                -buy name_id qtd = 1 / buy itemg
                 -sell name_id qtd = 1 / sell item
                 -cheat 
         +Controle de Dados
