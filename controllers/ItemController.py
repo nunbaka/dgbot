@@ -7,7 +7,7 @@ class ItemController(CatalogAsync):
         self.strings = club.strings.ic
         self.commands = {
             "add item ": self.add_element,
-            "new item list ": self.new_dataList,
+            "new item list ": self.new_datalist,
             "remove item ": self.remove_element,
             
             "items": self.send_catalog

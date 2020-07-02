@@ -6,7 +6,7 @@ class SkillController(CatalogAsync):
         self.strings = club.strings.ic
         self.commands = {
             "add skill ": self.add_element,
-            "new skill list ": self.new_dataList,
+            "new skill list ": self.new_datalist,
             "remove skill ": self.remove_element,
             
             "skills": self.send_catalog

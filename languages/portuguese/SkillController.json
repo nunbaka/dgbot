@@ -1,10 +1,16 @@
 {
     "catalog_name":"Catálogo de Skills:",
-    "give_success":{
-        "content":"<#author>, <#user> recebeu <#title> x<#qtd>"
+    "add_element:dict_error":{
+        "content":"<#author>, o dicionário informado é invalido!"
     },
-    "give_fail":{
-        "content":"<#author>, <#user> não pode receber <#title>"
+    "add_element:no_datalist_error":{
+        "content":"<#author>, a datalist <#title> não foi encontrada!"
+    },
+    "add_element:success":{
+        "content":"<#author>, o elemento foi adicionado com sucesso!"
+    },
+    "remove_element:args_error":{
+        "content":"<#author>, Argumentos inválidos!\nInforme datalist_name skill_name" 
     },
     "noElement_error":{
         "content":"<#author>, skill não encontrada"
@@ -12,13 +18,13 @@
     "noDatalist_error":{
         "content":"<#author>, Datalist Inexistente!"
     },
-    "created_datalist":{
+    "new_datalist_success":{
         "content":"<#author>, Datalist <#title> criada!"
     },
     "remove_element_error":{
         "content":"<#author>, Não foi possível deletar a skill" 
     },
-    "remove_element_args_error":{
-        "content":"<#author>, Argumentos inválidos!\nInforme datalist_name skill_name" 
+    "del_datalist_success":{
+        "content":"<#author>, Datalist <#title> deletada!"
     }
 }
