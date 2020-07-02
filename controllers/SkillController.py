@@ -1,6 +1,6 @@
-from classes.Catalog import CatalogAsync
+from classes.Catalog import Library
 
-class SkillController(CatalogAsync):
+class SkillController(Library):
     def __init__(self, club):
         super().__init__(club, name="skills")
         self.strings = club.strings.ic

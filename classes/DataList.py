@@ -19,11 +19,15 @@ class Element(dict):
             return await context.sendChannel(msg)
         return None
 
-    def getRef(self, qtd=1):
-        return {
-            "title": self['msg']['embed']['title'],
-            "qtd": qtd
-        }
+    def isSingle(self):
+        if existKey('single', self):
+            return self['single']
+        return True
+    
+    def isPublic(self):
+        if existKey('public', self):
+            return self['public']
+        return True
 # local termina com barra
 
 
@@ -63,26 +67,3 @@ class DataList(Database):
         elm_id = str.lower(unidecode(elm_dict['msg']['embed']['title']))
         self.update({elm_id: elm_dict})
         return Element(elm_dict)
-
-
-class RefList(DataList):
-    def __init__(self, datalists=[], **kv):
-        self.datalists = datalists
-        super().__init__(**kv)
-
-    def get(self, title):
-        for datalist in self.datalists:
-            elm = datalist.get(title)
-            if elm:
-                return elm
-
-    async def send(self, context: Context):
-        channel = context.channel
-        text = f"```{self.filename.capitalize()}```"
-        i = 1
-        for key, value in self.items():
-            # e = o dicionário usado no embed
-            e = value['msg']['embed']
-            text += f"\t{i} - {e['title']}\n"
-            i += 1
-        return await channel.send(text)

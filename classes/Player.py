@@ -1,4 +1,4 @@
-from p.Inventory import Inventory
+from classes. import ItemStorage
 
 
 class Player:
@@ -7,7 +7,7 @@ class Player:
         self.strings = self.club.strings.p
         self.key = pKey
         self.local = f"{club.local}players/{pKey}/"
-        self.inventory = Inventory(self, club.ic)
+        self.inventory = ItemStorage(self, club.ic)
         # self.spells = Spell()
 
     def getCommands(self):
