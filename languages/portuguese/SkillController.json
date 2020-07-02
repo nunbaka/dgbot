@@ -1,30 +1,38 @@
 {
     "catalog_name":"Catálogo de Skills:",
-    "add_element:dict_error":{
-        "content":"<#author>, o dicionário informado é invalido!"
+    "add_element":{
+        "dict_error":{
+            "content":"<#author>, o dicionário informado é invalido!"
+        },
+        "no_datalist_error":{
+            "content":"<#author>, a datalist <#title> não foi encontrada!"
+        },
+        "success":{
+            "content":"<#author>, o elemento foi adicionado com sucesso!"
+        }
     },
-    "add_element:no_datalist_error":{
-        "content":"<#author>, a datalist <#title> não foi encontrada!"
+    "remove_element":{
+        "args_error":{
+            "content":"<#author>, Argumentos inválidos!\nInforme datalist_name skill_name" 
+        },
+        "success":{
+            "content":"<#author>, o elemento <#title> foi removido com sucesso!"
+        },
+        "no_exist_fail":{
+            "content":"<#author>, o elemento ou a datalist informada não existe!"
+        }
     },
-    "add_element:success":{
-        "content":"<#author>, o elemento foi adicionado com sucesso!"
+    "new_datalist":{
+        "success":{
+            "content":"<#author>, a datalist <#title> foi criada com sucesso!"
+        }
     },
-    "remove_element:args_error":{
-        "content":"<#author>, Argumentos inválidos!\nInforme datalist_name skill_name" 
-    },
-    "noElement_error":{
-        "content":"<#author>, skill não encontrada"
-    },
-    "noDatalist_error":{
-        "content":"<#author>, Datalist Inexistente!"
-    },
-    "new_datalist_success":{
-        "content":"<#author>, Datalist <#title> criada!"
-    },
-    "remove_element_error":{
-        "content":"<#author>, Não foi possível deletar a skill" 
-    },
-    "del_datalist_success":{
-        "content":"<#author>, Datalist <#title> deletada!"
+    "del_datalist":{
+        "success":{
+            "content":"<#author>, a datalist <#title> foi criada com sucesso!"
+        },
+        "no_datalist_fail":{
+            "content":"<#author>, a datalist <#title> não existe!"
+        }
     }
 }

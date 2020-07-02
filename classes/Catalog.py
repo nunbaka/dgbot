@@ -6,6 +6,10 @@ from classes.Interface.ReactionMessage import PageMessage
 from library import getCurrentTime, existKey
 from typing import Union
 
+# uma datalist é como se fosse uma categoria
+# um elemento é um dado que aquela categoria dada
+# um catalaogo contém várias categorias
+
 class Catalog(dict):
     def __init__(self, club, name=""):
         self.club = club
@@ -37,7 +41,7 @@ class Catalog(dict):
         datalist_id = unidecode(str.lower(datalist_name))
         self[datalist_id] = DataList(
             local=self.club.local+f"datalists/{self.name}/", filename=datalist_id)
-        self.datalists[datalist_id] = getCurrentTime()
+        self.datalists[datalist_id] = datalist_name
         self.datalists.save()
         return self[datalist_id]
 
@@ -63,7 +67,8 @@ class Catalog(dict):
         pages = []
         for datalist_id, datalist in self.items():
             datalist_pages = []
-            text = f"```>> {datalist_id.capitalize()} <<```" 
+            datalist_name = self.datalists[datalist_id]
+            text = f"```>> {datalist_name} <<```" 
             i = 0
             for elm_id, elm_dict in datalist.items():
                 embed = elm_dict['msg']['embed']
@@ -89,6 +94,8 @@ class CatalogAsync(Catalog):
         super().__init__(*v, **kv)
 
     async def add_element(self, context):
+        # adiciona um elemento a uma datalist presente no catalogo
+        s = self.strings['add_element']
         # pegando o nome da datalist
         datalist_name = " ".join(context.args)
         try:
@@ -97,50 +104,78 @@ class CatalogAsync(Catalog):
         except Exception:
             # em caso de dicionário mal informado
             await context.sendChannel(
-                self.strings['add_element:dict_error'])
+                s['dict_error'])
             return None
         # tentando adicionar a datalist
         elm = super().add_element(datalist_name, elm_dict)
         if elm:
             # em caso de sucesso
             await context.sendChannel(
-                self.strings['add_element:success'])
+                s['success'])
             return await elm.send(context)
         # em caso de falha (sem datalist)
         await context.sendChannel(
-            self.strings['add_element:no_datalist_error'],
+            s['no_datalist_error'],
             title = datalist_name)
         return None
 
     async def remove_element(self, context):
+        # remove um elemento de uma datalist do catalogo
+        s = self.strings['remove_element']
         try:
-            datalist_name = args[0]
-            elm_name = args[1]
+            # pega o primeiro argumento como nome do catalogo
+            datalist_name = context.args[0]
+            # pega o resto dos argumentos como nome do elemento
+            elm_name = " ".join(context.args[1:])
         except Exception:
+            # em caso de uma entrada mal informada
             await context.sendChannel(
-                self.strings['remove_element:args_error'])
+                s['args_error'])
+        # tentativa de remover o elemento da datalist
         elm = super().remove_element(datalist_name, elm_name)
         if elm:
+            # em caso de sucesso, enviar mensagem de sucesso
+            await context.sendChannel(
+                s['success'],
+                title = elm_name)
+            # enviar também o elemento removido
             return await elm.send(context)
-        await context.sendChannel(self.strings['remove_element_error'])
+        # em caso de falha:
+        # pode ser por não existir datalist
+        # ou por não existir o elemento
+        await context.sendChannel(
+            s['no_exist_fail'])
         return None
 
     async def new_datalist(self, context):
-        s = self.strings
+        # cria uma nova datalist
+        s = self.strings['new_datalist']
+        # recebe o nome da datalist
         datalist_name = " ".join(context.args)
         datalist = super().new_datalist(datalist_name)
         if datalist:
-            return await context.sendChannel(s['new_datalist_success'],
-                                             title=datalist_name)
+            # em caso de sucesso
+            return await context.sendChannel(
+                s['success'],
+                title=datalist_name)
 
     async def del_datalist(self, context):
-        s = self.strings
+        # cria uma nova datalist
+        s = self.strings['del_datalist']
+        # cria uma nova datalist
         datalist_name = " ".join(context.args)
         datalist = super().del_datalist(datalist_name)
         if datalist:
-            return await context.sendChannel(s['del_datalist_success'],
-                                             title=datalist_name)
-        return
+            # em caso de sucesso
+            return await context.sendChannel(
+                s['success'],
+                title=datalist_name)
+        # não existir datalist
+        context.sendChannel(
+            s['no_datalist_fail'],
+            title= datalist_name)
+        return None
+
     async def send_catalog(self, context):
         pages = self.get_pages()
         rm = PageMessage(context,
