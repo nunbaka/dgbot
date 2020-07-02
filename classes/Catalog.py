@@ -1,8 +1,8 @@
 from unidecode import unidecode
 from classes.Database import Database
 from json import loads
-from classes.DataList import DataList, Element
-from classes.Interface.ReactionMessage import PageMessage
+from classes.DataList import Datalist, Element
+from classes.interface.ReactionMessage import PageMessage
 from library import getCurrentTime, existKey
 from typing import Union
 
@@ -37,15 +37,15 @@ class Catalog(dict):
                 return elm
         return None
         
-    def new_datalist(self, datalist_name: str) -> (DataList):
+    def new_datalist(self, datalist_name: str) -> (Datalist):
         datalist_id = unidecode(str.lower(datalist_name))
-        self[datalist_id] = DataList(
-            local=self.master.local+f"datalists/{self.name}/", filename=datalist_id)
+        self[datalist_id] = Datalist(
+            local=self.master.local+self.name+"/", filename=datalist_id)
         self.datalists[datalist_id] = datalist_name
         self.datalists.save()
         return self[datalist_id]
 
-    def del_datalist(self, datalist_name: str) -> (DataList):
+    def del_datalist(self, datalist_name: str) -> (Datalist):
         datalist_id = unidecode(str.lower(datalist_name))
         if existKey(datalist_id, self):
             datalist = self[datalist_id]
@@ -96,8 +96,8 @@ class Catalog(dict):
     def load_datalists(self):
         a = {}
         for datalist_id, v in self.datalists.items():
-            a[datalist_id] = DataList(
-                local=self.master.local+"datalists/", filename=datalist_id)
+            a[datalist_id] = Datalist(
+            local=self.master.local+self.name+"/", filename=datalist_id)
         return a
 
 class Library(Catalog):
@@ -164,12 +164,11 @@ class Library(Catalog):
         # recebe o nome da datalist
         datalist_name = " ".join(context.args)
         datalist = super().new_datalist(datalist_name)
-        if datalist:
-            # em caso de sucesso
-            return await context.sendChannel(
-                s['success'],
-                title=datalist_name)
-
+        print(datalist)
+        return await context.sendChannel(
+            s['success'],
+            title=datalist_name)
+        
     async def del_datalist(self, context):
         # cria uma nova datalist
         s = self.strings['del_datalist']

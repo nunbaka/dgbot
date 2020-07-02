@@ -1,5 +1,4 @@
-from classes. import ItemStorage
-
+from classes.player.ItemStorage import ItemStorage
 
 class Player:
     def __init__(self, club, pKey):
