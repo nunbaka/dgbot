@@ -1,24 +1,38 @@
 {
     "catalog_name":"Catálogo de Itens:",
-    "give_success":{
-        "content":"<#author>, <#user> recebeu <#title> x<#qtd>"
+    "add_element":{
+        "dict_error":{
+            "content":"<#author>, o dicionário informado é invalido!"
+        },
+        "no_datalist_error":{
+            "content":"<#author>, a Categoria <#title> não foi encontrada!"
+        },
+        "success":{
+            "content":"<#author>, o item foi adicionado com sucesso!"
+        }
     },
-    "give_fail":{
-        "content":"<#author>, <#user> não pode receber <#title>"
+    "remove_element":{
+        "args_error":{
+            "content":"<#author>, Argumentos inválidos!\nInforme categoria_name item_name" 
+        },
+        "success":{
+            "content":"<#author>, o item <#title> foi removido com sucesso!"
+        },
+        "no_exist_fail":{
+            "content":"<#author>, o item ou a categoria informada não existe!"
+        }
     },
-    "noElement_error":{
-        "content":"<#author>, item não encontrado"
+    "new_datalist":{
+        "success":{
+            "content":"<#author>, a categoria <#title> foi criada com sucesso!"
+        }
     },
-    "noDatalist_error":{
-        "content":"<#author>, Datalist Inexistente!"
-    },
-    "created_datalist":{
-        "content":"<#author>, Datalist <#title> criada!"
-    },
-    "remove_element_error":{
-        "content":"<#author>, Não foi possível deletar o element" 
-    },
-    "remove_element_args_error":{
-        "content":"<#author>, Argumentos inválidos!\nInforme datalist_name item_name" 
+    "del_datalist":{
+        "success":{
+            "content":"<#author>, a categoria <#title> foi criada com sucesso!"
+        },
+        "no_datalist_fail":{
+            "content":"<#author>, a cateogira <#title> não existe!"
+        }
     }
 }

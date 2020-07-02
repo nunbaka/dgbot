@@ -2,6 +2,12 @@ from classes.Catalog import CatalogAsync
 
 class SkillController(CatalogAsync):
     def __init__(self, club):
-        super().__init__(club, name="skillController")
+        super().__init__(club, name="skills")
         self.strings = club.strings.ic
-        self.commands = {}
+        self.commands = {
+            "add skill ": self.add_element,
+            "new skill list ": self.new_datalist,
+            "remove skill ": self.remove_element,
+            "del skill list ": self.del_datalist,
+            "skills": self.send_catalog
+        }
