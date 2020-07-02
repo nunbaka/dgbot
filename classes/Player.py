@@ -1,4 +1,3 @@
-from classes.player.ItemStorage import ItemStorage
 from classes.player.Inventory import Inventory
 
 class Player:

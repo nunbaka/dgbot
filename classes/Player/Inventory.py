@@ -1,6 +1,6 @@
 
 from library import existKey
-from classes.Catalog import Catalog
+from classes.Datalist import Datalist
 from unidecode import unidecode
 # classe de inventario
 # contém listas pre definidas de armazenamento de itens

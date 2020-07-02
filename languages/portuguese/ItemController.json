@@ -1,5 +1,6 @@
 {
     "catalog_name":"Catálogo de Itens:",
+    "empty_catalog":"Sem itens para mostrar!",
     "add_element":{
         "dict_error":{
             "content":"<#author>, o dicionário informado é invalido!"
@@ -29,7 +30,7 @@
     },
     "del_datalist":{
         "success":{
-            "content":"<#author>, a categoria <#title> foi criada com sucesso!"
+            "content":"<#author>, a datalist <#title> foi apagada!"
         },
         "no_datalist_fail":{
             "content":"<#author>, a cateogira <#title> não existe!"

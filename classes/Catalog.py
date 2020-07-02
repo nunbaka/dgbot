@@ -1,7 +1,7 @@
 from unidecode import unidecode
 from classes.Database import Database
 from json import loads
-from classes.DataList import Datalist, Element
+from classes.Datalist import Datalist, Element
 from classes.interface.ReactionMessage import PageMessage
 from library import getCurrentTime, existKey
 from typing import Union
@@ -189,6 +189,9 @@ class Library(Catalog):
 
     async def send_catalog(self, context):
         pages = self.get_pages()
+        if len(pages)==0:
+            self.strings['empty_catalog']
+            return None
         rm = PageMessage(context,
                          pages,
                          self.strings['catalog_name'])

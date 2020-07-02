@@ -7,10 +7,10 @@ class ItemController(Library):
         self.club = club
         self.strings = club.strings.ic
         self.commands = {
-            "add item ": self.add_element,
             "new item list ": self.new_datalist,
-            "remove item ": self.remove_element,
             "del item list ": self.del_datalist,
+            "add item ": self.add_element,
+            "remove item ": self.remove_element,
             "items": self.send_catalog,
             "give item ": self.give,
         }

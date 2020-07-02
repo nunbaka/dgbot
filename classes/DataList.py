@@ -69,3 +69,5 @@ class Datalist(Database):
         return None
 
     def exist_element(self, elm_name) -> (Element):
+        elm_id = unidecode(str.lower(elm_name))
+        return existKey(elm_id, self)

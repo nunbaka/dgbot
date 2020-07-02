@@ -1,7 +1,7 @@
-/private
-/__pycache__/
-/classes/__pycache__/
-.mypy_cache
+/__pycache__
+/classes/__pycache__
+/classes/interface/__pycache__
+/classes/player/__pycache__
 /controllers/__pycache__
-/.vscode
-/classes/Interface/__pycache__/
+/private
+.gitignore
