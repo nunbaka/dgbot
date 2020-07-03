@@ -29,13 +29,11 @@ IRD = {
 }
 
 
-def existKey(_key, _dict):
+def existKey(_key: str, _dict: dict) -> (bool):
     try:
-        if _key in list(_dict.keys()):
-            return True
+        return _key in list(_dict.keys())
     except Exception:
-        pass
-    return False
+        return False
 
 
 def handleArgs(content):

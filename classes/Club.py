@@ -47,14 +47,18 @@ class Club:
                     # recebe os argumentos, sem o comando
                     content = content[len(prefix+command):]
                     args, comment = handleArgs(content)
-                    context.setArgs(args, comment, self)
+                    context.args = args
+                    context.comment = comment
+                    context.club = self
                     return await function(context)
-        context.setPlayer(self.getPlayer(context.message.author))
+        context.player = self.getPlayer(context.message.author)
         for command, function in context.player.getCommands().items():
             if content.startswith(prefix+command):
                 content = content[len(prefix+command):]
                 args, comment = handleArgs(content)
-                context.setArgs(args, comment, self)
+                context.args = args
+                context.comment = comment
+                context.club = self
                 return await function(context)
 
     def getPlayer(self, user) -> Player:

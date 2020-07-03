@@ -22,15 +22,10 @@ class Context:
         self.author = message.author
         self.channel = message.channel
         self.users = message.mentions
-
-    def setPlayer(self, player):
-        self.player = player
-
-    def setArgs(self, args, comment, club):
-        # setando os argumentos e o comentario do contexto
-        self.args = args
-        self.comment = comment
-        self.club = club
+        self.args = []
+        self.comment = ""
+        self.club = None
+        self.player = None
 
     async def sendChannel(self, message,
                           **kv) -> (discord.Message):
