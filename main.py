@@ -43,7 +43,7 @@ from classes.Club import Club
                 -shop / view the shop catalog
                 -buy name_id qtd = 1 / buy itemg
                 -sell name_id qtd = 1 / sell item
-                -cheat 
+                -cheat
         +Controle de Dados
             +roll dice
     +Player:
@@ -58,8 +58,9 @@ from classes.Club import Club
         -Economy:
             -money / MONEY
             -bank / MONEY (in bank)
-            -trade @player / Trade Event 
+            -trade @player / Trade Event
 """
+
 
 class Client(discord.Client):
     def __init__(self):

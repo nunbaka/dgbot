@@ -1,5 +1,4 @@
 import discord
-import asyncio
 from library import existKey
 
 # author = quem enviou a mensagem
@@ -146,12 +145,12 @@ class Msg(dict):
             return ""
 
     def handleMessage(
-        self, string, context=None,
-        total="",
-        expression="",
-        title="",
-        user="",
-        qtd=0,) -> (str):
+            self, string, context=None,
+            total="",
+            expression="",
+            title="",
+            user="",
+            qtd=0) -> (str):
         author = context.author.mention
         comment = context.comment
         replaces = {

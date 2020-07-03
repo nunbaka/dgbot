@@ -1,4 +1,5 @@
-from classes.Catalog import Library
+from classes.Library import Library
+
 
 class SkillController(Library):
     def __init__(self, club):

@@ -6,3 +6,6 @@
 /controllers/__pycache__
 /private
 .gitignore
+/;vscode
+/.mypy_cache
+/.pytest_cache

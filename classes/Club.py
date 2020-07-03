@@ -3,17 +3,31 @@ from library import handleArgs, existKey
 from controllers.DiceController import DiceController
 from controllers.ItemController import ItemController
 from controllers.SkillController import SkillController
-from classes.Player import Player
+from classes.player.Inventory import Inventory
 # COMANDOS ESTÃO EM CONTROLLERS
 
 # CLUB:
 # players = {}, lista de players, pela chave
 
 
+class Player:
+    def __init__(self, club, pKey):
+        self.club = club
+        self.strings = self.club.strings.p
+        self.key = pKey
+        self.local = f"{club.local}players/{pKey}/"
+        self.inventory = Inventory(self)
+        # self.spells = Spell()
+
+    def getCommands(self):
+        cmds = {}
+        return cmds
+
+
 class Club:
     def __init__(self, ckey, guild: discord.Guild, strings):
         self.key = ckey
-        self.players = {}
+        self.players: dict = dict()
         self.local = f"Clubs/{self.key}/"
         self.guild = guild
         self.strings = strings
