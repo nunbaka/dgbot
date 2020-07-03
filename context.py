@@ -36,9 +36,9 @@ class Context:
     async def sendChannel(self, message,
                           **kv) -> (discord.Message):
         try:
-            msg = Msg(self, message)
-            content = msg.getContent(**kv)
-            embed = msg.getEmbed(**kv)
+            msg = Msg(message)
+            content = msg.getContent(context=self, **kv)
+            embed = msg.getEmbed(context=self, **kv)
             ctx = await self.channel.send(content, embed=embed)
             if existKey("reactions", message):
                 reactions = message['reactions']
@@ -59,9 +59,9 @@ class Context:
                          **kv):
         # o mesmo que sendChannel, porém envia para quem chamou o evento
         try:
-            msg = Msg(self, message)
-            content = msg.getContent(**kv)
-            embed = msg.getEmbed(**kv)
+            msg = Msg(message)
+            content = msg.getContent(context=self, **kv)
+            embed = msg.getEmbed(context=self, **kv)
             ctx = await self.author.send(content, embed=embed)
             if existKey("reactions", message):
                 reactions = message['reactions']
@@ -79,9 +79,39 @@ class Context:
 
 
 class Msg(dict):
-    def __init__(self, context: Context, *v, **kv):
-        self.context = context
+    def __init__(self, *v, **kv):
         super().__init__(*v, **kv)
+
+    def mergeMessage(self, message):
+        try:
+            if not existKey('content', self):
+                self['content'] = message['content']
+            else:
+                self['content'] = self['content']+"\n\n"+message['content']
+        except Exception:
+            pass
+        try:
+            if not existKey('embed', self):
+                self['embed'] = message['embed']
+            else:
+                d = self['embed']['description']
+                d2 = message['embed']['description']
+                self['embed']['description'] = d+'\n\n'+d2
+        except Exception:
+            pass
+        return self
+
+    def setContent(self, content):
+        try:
+            self['content'] = content
+        except Exception:
+            pass
+
+    def setDescription(self, description):
+        try:
+            self['embed']['description'] = description
+        except Exception:
+            pass
 
     def getEmbed(self, **kv) -> (discord.Embed):
         if not existKey("embed", self):
@@ -111,22 +141,19 @@ class Msg(dict):
 
     def getContent(self, **kv):
         try:
-            if existKey("content", self):
-                string = self.handleMessage(self['content'], **kv)
-                return string
+            return self.handleMessage(self['content'], **kv)
         except Exception:
             return ""
 
     def handleMessage(
-        self, string,
+        self, string, context=None,
         total="",
         expression="",
         title="",
         user="",
-        qtd=0,
-    ) -> (str):
-        author = self.context.author.mention
-        comment = self.context.comment
+        qtd=0,) -> (str):
+        author = context.author.mention
+        comment = context.comment
         replaces = {
             ("<#author>", author),
             ("<#total>", str(total)),

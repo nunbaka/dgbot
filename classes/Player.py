@@ -6,8 +6,7 @@ class Player:
         self.strings = self.club.strings.p
         self.key = pKey
         self.local = f"{club.local}players/{pKey}/"
-        self.inventory = Inventory(
-            local=self.local, filename="inventory.json")
+        self.inventory = Inventory(self)
         # self.spells = Spell()
 
     def getCommands(self):

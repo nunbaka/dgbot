@@ -1,7 +1,6 @@
 {
-    "public":false,
-    "unknown":true,
-    "single":true,
+    "public":true,
+    "unknown":false,
     "rarity":"common",
     "tags":[],
     "msg":{
@@ -9,12 +8,14 @@
             "title":"",
             "description":"",
             "image_url":"",
-            "color":0,
+            "color":9099,
             "fields":[]
         },
         "reactions":[]
     },
     "metadata":{
         "events":{}
-    }
+    },
+    "pre_requisites":[],
+    "restrictions":[]
 }

@@ -1,9 +1,14 @@
 {
     "catalog_name":"Catálogo de Itens:",
-    "empty_catalog":"Sem itens para mostrar!",
+    "empty_catalog":{
+        "content":"Sem itens para mostrar!"
+    },
     "add_element":{
         "dict_error":{
             "content":"<#author>, o dicionário informado é invalido!"
+        },
+        "datalist_no_arg":{
+            "content":"<#author>, necessita informar a categoria!"
         },
         "no_datalist_error":{
             "content":"<#author>, a Categoria <#title> não foi encontrada!"
@@ -23,17 +28,20 @@
             "content":"<#author>, o item ou a categoria informada não existe!"
         }
     },
-    "new_datalist":{
+    "add_datalist":{
         "success":{
             "content":"<#author>, a categoria <#title> foi criada com sucesso!"
+        },
+        "already_exist":{
+            "content":"<#author>, a datalist <#title> já existe"
         }
     },
-    "del_datalist":{
+    "remove_datalist":{
         "success":{
             "content":"<#author>, a datalist <#title> foi apagada!"
         },
         "no_datalist_fail":{
-            "content":"<#author>, a cateogira <#title> não existe!"
+            "content":"<#author>, a categoria <#title> não existe!"
         }
     }
 }
