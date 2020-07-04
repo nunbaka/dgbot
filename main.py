@@ -108,7 +108,7 @@ class Client(discord.Client):
         # por fim roda o contexto no club criado
         await club.run(context)
 
-    def getClub(self, guild: discord.Guild) -> Club:
+    def getClub(self, guild: discord.Guild) -> (Club):
         # FUNÇÃO PARA INSTANCIAR UM CLUB
         # cria a chave do club através da guild
         cKey = str(guild.id)

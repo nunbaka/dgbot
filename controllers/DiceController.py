@@ -41,6 +41,10 @@ class DiceController:
     def roll(self, nDices: int, nFaces: int) -> Roll:
         # soma total dos dados
         total = 0
+        if nDices > 250:
+            nDices = 250
+        if nFaces > 500:
+            nFaces = 500
         # lista de dados rolado
         dices = []
         # rolando os dados
@@ -58,6 +62,7 @@ class DiceController:
         expression = ""
         # O PADRÃO DE UM DADO
         pattern = re.compile('\d*d\d+')
+        where = 0
         for arg in args:
             # INCREMENTANDO TOTAL E EXPRESSAO COM O ARGUMENTO
             total += arg+" "
@@ -77,8 +82,13 @@ class DiceController:
                 dicef = dicef.replace("<#nFaces>", str(roll.nFaces))
                 dicef = dicef.replace("<#dices>", str(roll.dices))
                 dicef = dicef.replace("<#total>", str(roll.total))
-                expression = expression.replace(
+                if len(dices) > 5:
+                    dicef = f"{roll.nDices}d{roll.nFaces}:{roll.total}"
+                elif roll.nDices > 100:
+                    dicef = f"{roll.nDices}d{roll.nFaces}:{roll.total}"
+                expression = expression[:where] + expression[where:].replace(
                     dice, dicef, 1)
+                where = where + expression[where:].find(dicef)+len(dicef)
         # CALCULANDO A EXPRESSÃO DE TOTAL ENCONTRADA
         total = eval(total)
         return total, expression

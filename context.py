@@ -22,7 +22,7 @@ class Context:
         self.author = message.author
         self.channel = message.channel
         self.users = message.mentions
-        self.args = []
+        self.args: list = []
         self.comment = ""
         self.club = None
         self.player = None
@@ -140,7 +140,8 @@ class Msg(dict):
             return ""
 
     def handleMessage(
-            self, string, context=None,
+            self, string,
+            context=None,
             total="",
             expression="",
             title="",

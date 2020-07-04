@@ -31,9 +31,9 @@ class Club:
         self.local = f"Clubs/{self.key}/"
         self.guild = guild
         self.strings = strings
-        self.dc = DiceController(self)
         self.ic = ItemController(self)
         self.sc = SkillController(self)
+        self.dc = DiceController(self)
 
     async def run(self, context):
         controllers = [self.dc, self.ic, self.sc]
