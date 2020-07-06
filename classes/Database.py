@@ -6,10 +6,10 @@ from classes.interface.ReactionMessage import PageMessage
 
 
 class Database(MasterBehavior):
-    def __init__(self, master, key, tKey=""):
+    def __init__(self, master, key, tKey="", *v, **kv):
         super().__init__(master, key)
         self.key += tKey
-        self.dict__init__(Json.loadWrite(self.local+self.key))
+        self.dict__init__(Json.loadWrite(self.local+self.key, *v, **kv))
 
     def save(self):
         Json.write(pathfile=self.local+self.key, default=self, sort_keys=True)
@@ -40,12 +40,15 @@ class Element(Dict):
         return Message(message)
 
     def isPublic(self) -> bool:
-        return self['public']
+        if self.exist('public'):
+            return self['public']
+        else:
+            return True
 
 
 class Datalist(Database):
-    def __init__(self, master, key, tkey="_datalist"):
-        super().__init__(master, key, tkey)
+    def __init__(self, master, key, tKey="_datalist", *v, **kv):
+        super().__init__(master, key, tKey, *v, **kv)
 
     def new_element(self, elm_dict: dict) -> Element:
         # a função que cria a datalist especificamente
@@ -64,8 +67,11 @@ class Datalist(Database):
         elm = self.new_element(elm_dict)
         return elm
 
-    def get_element(self, elm_name: str) -> Element:
-        return self.new_element(self[elm_name])
+    def get_element(self, elm_name: str) -> Union[Element, None]:
+        elm = self[elm_name]
+        if elm:
+            return self.new_element(elm)
+        return None
 
     def get_pages(self, limit=10):
         values = list(self.values())
@@ -99,9 +105,9 @@ class Catalog(MasterBehavior):
         # que o catalogo armazena
         return Datalist(self, datalist_name)
 
-    def add_datalist(self, datalist_name: str) -> (bool):
+    def create_datalist(self, datalist_name: str) -> (bool):
         # instancia  a datalist no catalogo
-        if self.contain(datalist_name):
+        if self.exist(datalist_name):
             # se ja existe uma datalist o nome
             return False
         # instancia
@@ -112,20 +118,21 @@ class Catalog(MasterBehavior):
         self.datalists.save()
         return True
 
-    def remove_datalist(self, datalist_name: str) -> (Datalist):
+    def remove_datalist(self, datalist_name: str) -> (bool):
         datalist: Datalist = self.delete(datalist_name)
         if self.datalists.delete(datalist_name):
             self.datalists.save()
         return datalist
 
-    def add_element(self, datalist_name: str,
-                    elm_dict: Dict) -> (Union[Element, None]):
+    def create_element(self, datalist_name: str,
+                       elm_dict: Dict) -> (Union[Element, None]):
         try:
             datalist: Datalist = self[datalist_name]
             elm = datalist.add_element(elm_dict)
             datalist.save()
             return elm
-        except Exception:
+        except Exception as inst:
+            print(inst)
             return None
 
     def remove_element(self, datalist_name: str,
@@ -149,12 +156,16 @@ class Catalog(MasterBehavior):
 
     def get_element_by_name(self, elm_name: str
                             ) -> Union[Tuple[None, None], Tuple[Element, str]]:
-        for datalist_key, datalist in self.items():
-            if not datalist:
-                continue
-            elm = datalist.get_element(elm_name)
-            if elm:
-                return elm, datalist_key
+        try:
+            for datalist_key, datalist in self.items():
+                if not datalist:
+                    continue
+                elm = datalist.get_element(elm_name)
+                if elm:
+                    return elm, datalist_key
+        except Exception as inst:
+            print(inst)
+            pass
         return None, None
 
     def get_all_pages(self) -> (list):
@@ -163,6 +174,9 @@ class Catalog(MasterBehavior):
             if not datalist:
                 continue
             datalist_page = datalist.get_pages()
+            if len(datalist_page) == 0:
+                print(datalist_key)
+                continue
             datalist_name = self.datalists[datalist_key]
             datalist_title = f"```>>> {datalist_name} <<<```"
             datalist_page[0] = datalist_title+datalist_page[0]
@@ -180,12 +194,12 @@ class Library(Catalog):
     def __init__(self, master, key):
         super().__init__(master, key)
 
-    async def add_datalist(self, event):
+    async def create_datalist(self, event):
         # cria uma nova datalist
-        s = self.strings['add_datalist']
+        s = self.strings['create_datalist']
         # recebe o nome da datalist
         datalist_name = " ".join(event.args)
-        success = super().add_datalist(datalist_name)
+        success = super().create_datalist(datalist_name)
         if success:
             return await event.send(
                 s['success'],
@@ -213,9 +227,9 @@ class Library(Catalog):
             title=datalist_name)
         return None
 
-    async def add_element(self, event):
+    async def create_element(self, event):
         # adiciona um elemento a uma datalist presente no catalogo
-        s = self.strings['add_element']
+        s = self.strings['create_element']
         # pegando o nome da datalist
         datalist_name = " ".join(event.args)
         if len(datalist_name) == 0:
@@ -231,12 +245,12 @@ class Library(Catalog):
                 s['dict_error'])
             return None
         # tentando adicionar a datalist
-        elm = super().add_element(datalist_name, elm_dict)
+        elm = super().create_element(datalist_name, elm_dict)
         if elm:
             # em caso de sucesso
             elm_msg = elm.getMessage()
             elm_success = Message(s['success'])
-            elm_msg.mergeMessage(elm_success)
+            elm_msg.merge(elm_success)
             return await event.send(elm_msg)
         # em caso de falha (sem datalist)
         await event.send(
@@ -261,7 +275,7 @@ class Library(Catalog):
         if elm:
             # dando merge na mensagem do player + a de sucesso
             msg = elm.getMsg()
-            msg.mergeMessage(s['success'])
+            msg.merge(s['success'])
             return await event.send(
                 msg, title=elm_name)
         # em caso de falha:
@@ -316,6 +330,9 @@ class Library(Catalog):
 
     async def show_catalog(self, event):
         catalog_pages = self.get_all_pages()
+        if len(catalog_pages) == 0:
+            ctx = await event.send(self.strings['empty_catalog'])
+            return ctx
         pm = PageMessage(
             event,
             catalog_pages,

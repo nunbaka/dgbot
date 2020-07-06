@@ -1,6 +1,6 @@
 {
     "catalog_name":"Catálogo de Skills:",
-    "add_element":{
+    "create_element":{
         "dict_error":{
             "content":"<#author>, o dicionário informado é invalido!"
         },

@@ -1,8 +1,9 @@
 from library import handleArgs, existKey
 from controllers.DiceController import DiceController
 from controllers.ItemController import ItemController
+from controllers.StatusController import StatusController
 from classes.player.Inventory import Inventory
-from classes.MasterBehavior import MasterBehavior
+from classes.MasterBehavior import MasterBehavior, Event
 # COMANDOS ESTÃO EM CONTROLLERS
 
 # CLUB:
@@ -14,7 +15,7 @@ class Player(MasterBehavior):
         super().__init__(*v, **kv)
         self.strings = self.master.strings.p
         self.local += f"players/{self.key}/"
-        self.inventory = Inventory(self)
+        self.inventory = Inventory(self, "Inventory")
         # self.spells = Spell()
 
     def getCommands(self):
@@ -32,13 +33,16 @@ class Club(MasterBehavior):
             self, "ItemController")
         self.dc = DiceController(
             self, "DiceController")
+        self.ssc = StatusController(
+            self, "StatusController")
 
-    async def run(self, event):
-        controllers = [self.dc, self.ic]
+    async def run(self, event: Event):
+        controllers = [self.dc, self.ic, self.ssc]
         # para cada controller na lista de controllers
         event.club = self
-        content = event.message.content
+        content: str = event.message.content
         prefix = event.prefix
+        event_prefix = event.event_prefix
         for controller in controllers:
             # para cada comando e função nos comandos do controlador
             for command, function in controller.commands.items():
@@ -49,6 +53,10 @@ class Club(MasterBehavior):
                     event.args = args
                     event.comment = comment
                     return await function(event)
+        player = self.getPlayer(event.author)
+        event.player = player
+        if content.startswith(event_prefix):
+            print("Começa com prefixo")
 
     def getPlayer(self, user) -> Player:
         key = str(user.id)

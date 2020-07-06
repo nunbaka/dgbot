@@ -21,10 +21,9 @@ class Dict(dict):
     def delete(self, key):
         key = getKey(key)
         if super().__contains__(key):
-            value = self.__getitem__(key)
             del self[key]
-            return value
-        return None
+            return True
+        return False
 
     def exist(self, key):
         return super().__contains__(key)
@@ -142,10 +141,11 @@ class MasterBehavior(Dict):
 
 
 class Event:
-    def __init__(self, client, prefix, message: discord.Message):
+    def __init__(self, client, prefix, event_prefix, message: discord.Message):
         # CRIANDO UM CONTEXTO GERAL
         self.client = client
         self.prefix = prefix
+        self.event_prefix = event_prefix
         self.message = message
         self.guild = message.guild
         self.author = message.author

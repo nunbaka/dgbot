@@ -75,6 +75,7 @@ class Client(discord.Client):
         self.clubs = {}
         # prefixes contém os prefixos de cada club
         self.prefixes = Json.loadWrite(pathfile='private/prefixes')
+        self.event_prefixes = Json.loadWrite(pathfile='private/event_prefixes')
         # languages contém a linguagem selecionada em cada club
         self.languages = Json.loadWrite(pathfile='private/languages')
         # langugage contém todas as linguagens
@@ -102,11 +103,12 @@ class Client(discord.Client):
             return
         # recebe o prefixo da guild em questão
         prefix = self.getPrefix(message.guild)
+        event_prefix = self.getEventPrefix(message.guild)
         # instancia um club a partir da guild
         club = self.getClub(message.guild)
         # instancia um objeto contendo as informações do contexto
         # por fim roda o contexto no club criado
-        await club.run(Event(self, prefix, message))
+        await club.run(Event(self, prefix, event_prefix, message))
 
     def getClub(self, guild: discord.Guild) -> (Club):
         # FUNÇÃO PARA INSTANCIAR UM CLUB
@@ -118,6 +120,17 @@ class Client(discord.Client):
             # instanciando passando a chave e a linguagem
             self.clubs[key] = Club(self, key, strings)
         return self.clubs[key]
+
+    def getEventPrefix(self, guild: discord.Guild):
+        # DATABASE DOS PREFIXOS
+        # cria a chave da guild
+        cKey = str(guild.id)
+        if not existKey(cKey, self.event_prefixes):
+            # se o prefixo não existir
+            return '!'
+        else:
+            # se existir prefixo, retorne-o
+            return self.prefixes[cKey]
 
     def getPrefix(self, guild: discord.Guild):
         # DATABASE DOS PREFIXOS

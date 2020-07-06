@@ -10,5 +10,5 @@ class Strings:
     def __init__(self, local):
         self.dc = Json.loadWrite(pathfile=local+"DiceController")
         self.ic = Json.loadWrite(pathfile=local+"ItemController")
-        self.sc = Json.loadWrite(pathfile=local+"SkillController")
+        self.ssc = Json.loadWrite(pathfile=local+"StatusController")
         self.p = Json.loadWrite(pathfile=local+"Player")

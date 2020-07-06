@@ -1,33 +1,14 @@
 {
-    "public":true,
-    "unknown":false,
-    "rarity":"common",
+	"name":"Pontos de Vida - PV",
+    "description":"São uma medida da saúde do seu personagem. 
+    Ao chegar à zero, você entra no status morrendo, 
+    requisitando um teste de resistência a cada turno para se manter vivo.",
+	"image":"",
     "tags":[],
-    "msg":{
-        "embed":{
-            "title":"",
-            "description":"",
-            "image_url":"",
-            "color":9099,
-            "fields":[]
-        },
-        "reactions":[]
-    },
     "metadata":{
-        "events":{
-            "public":{
-
-            },
-            "private":{
-                "event_name":{
-                    "parameters":[],
-                    "default_parameters":[],
-                    "atributtes":[],
-                    "tags":[],
-                    "requisites":[],
-                    "restrictions":[]
-                }
-            }
+            "max": 100,
+            "min": 0,
+            "value": 100
         }
     }
 }

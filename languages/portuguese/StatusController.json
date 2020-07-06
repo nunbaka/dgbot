@@ -3,7 +3,7 @@
     "empty_catalog":{
         "content":"Sem itens para mostrar!"
     },
-    "create_element":{
+    "add_element":{
         "dict_error":{
             "content":"<#author>, o dicionário informado é invalido!"
         },
@@ -28,7 +28,7 @@
             "content":"<#author>, o item ou a categoria informada não existe!"
         }
     },
-    "create_datalist":{
+    "add_datalist":{
         "success":{
             "content":"<#author>, a categoria <#title> foi criada com sucesso!"
         },
