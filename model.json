@@ -14,8 +14,20 @@
         "reactions":[]
     },
     "metadata":{
-        "events":{}
-    },
-    "pre_requisites":[],
-    "restrictions":[]
+        "events":{
+            "public":{
+
+            },
+            "private":{
+                "event_name":{
+                    "parameters":[],
+                    "default_parameters":[],
+                    "atributtes":[],
+                    "tags":[],
+                    "requisites":[],
+                    "restrictions":[]
+                }
+            }
+        }
+    }
 }

@@ -1,7 +1,7 @@
 # main
 import discord
 from library import Json, getCurrentTime, existKey
-from context import Context
+from classes.MasterBehavior import Event
 from classes.Language import Language
 from classes.Club import Club
 
@@ -66,16 +66,17 @@ class Client(discord.Client):
     def __init__(self):
         super().__init__()
         # self.tokens contém os tokens de todos os bots
-        self.tokens = Json.loadWrite(pathfile='private/token.json')
+        self.tokens = Json.loadWrite(pathfile='private/token')
         # self.bot contém qual bot está sendo utilizado
         self.bot = "dev"
         self.version = "0.001"
         self.name = "DGBot"
+        self.local = "private/"
         self.clubs = {}
         # prefixes contém os prefixos de cada club
-        self.prefixes = Json.loadWrite(pathfile='private/prefixes.json')
+        self.prefixes = Json.loadWrite(pathfile='private/prefixes')
         # languages contém a linguagem selecionada em cada club
-        self.languages = Json.loadWrite(pathfile='private/languages.json')
+        self.languages = Json.loadWrite(pathfile='private/languages')
         # langugage contém todas as linguagens
         self.language = Language()
         # roda o client pela chave do token
@@ -104,20 +105,19 @@ class Client(discord.Client):
         # instancia um club a partir da guild
         club = self.getClub(message.guild)
         # instancia um objeto contendo as informações do contexto
-        context = Context(self, prefix, message)
         # por fim roda o contexto no club criado
-        await club.run(context)
+        await club.run(Event(self, prefix, message))
 
     def getClub(self, guild: discord.Guild) -> (Club):
         # FUNÇÃO PARA INSTANCIAR UM CLUB
         # cria a chave do club através da guild
-        cKey = str(guild.id)
-        if not existKey(cKey, self.clubs):
+        key = str(guild.id)
+        if not existKey(key, self.clubs):
             # se a se esta chave não foi instanciada, faça
             strings = self.getLanguage(guild)
             # instanciando passando a chave e a linguagem
-            self.clubs[cKey] = Club(cKey, guild, strings)
-        return self.clubs[cKey]
+            self.clubs[key] = Club(self, key, strings)
+        return self.clubs[key]
 
     def getPrefix(self, guild: discord.Guild):
         # DATABASE DOS PREFIXOS

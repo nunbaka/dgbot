@@ -1,4 +1,3 @@
-from context import Context
 import asyncio
 
 """
@@ -12,10 +11,10 @@ import asyncio
 
 
 class ReactionMessage:
-    def __init__(self, context: Context):
+    def __init__(self, event):
         self.ctx = None
         self.content = ""
-        self.context = context
+        self.event = event
         self.reactions: list = []
 
     async def add_reactions(self):
@@ -29,8 +28,8 @@ class ReactionMessage:
         except Exception:
             return False
 
-    async def sendChannel(self):
-        channel = self.context.channel
+    async def send(self):
+        channel = self.event.channel
         self.ctx = await channel.send(self.content)
         return self.ctx
 
@@ -40,7 +39,7 @@ class ReactionMessage:
         return await self.ctx.edit(content=self.content)
 
     async def wait_reaction(self, timeout=15):
-        client = self.context.client
+        client = self.event.client
         try:
             reaction, user = await client.wait_for(
                 'reaction_add',
@@ -53,18 +52,18 @@ class ReactionMessage:
 
     def check(self, reaction, user):
         # devolve qualquer reação feita que não seja do client
-        if user != self.context.client.user:
+        if user != self.event.client.user:
             return True
         return False
 
 
 class PageMessage(ReactionMessage):
-    def __init__(self, context: Context, pages=[], title=''):
+    def __init__(self, event, pages=[], title=''):
         self.page = 0
         self.pages = pages
         self.title = title
         self.nPages = len(pages)
-        super().__init__(context)
+        super().__init__(event)
         self.commands = {
             '⏮': self.firstPage,
             '⏪': self.previousPage,
@@ -72,16 +71,16 @@ class PageMessage(ReactionMessage):
             '⏭': self.lastPage
         }
         self.reactions = list(self.commands.keys())
-        self.content = self.title + self.pages[self.page]
+        self.content = self.title + self.pages[0]
 
     async def updateMessage(self):
         self.content = self.title + self.pages[self.page]
         await super().updateMessage()
 
     def check(self, reaction, user):
-        if user == self.context.client.user:
+        if user == self.event.client.user:
             return False
-        if not user == self.context.author:
+        if not user == self.event.author:
             return False
         if not (reaction.emoji in self.reactions):
             return False
@@ -104,6 +103,8 @@ class PageMessage(ReactionMessage):
             self.page = 0
 
     async def run(self):
+        await self.send()
+        await self.add_reactions()
         while True:
             try:
                 reaction, user = await self.wait_reaction()

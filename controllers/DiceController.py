@@ -1,7 +1,6 @@
-from random import randrange
-from context import Context
-from classes import Club
 import re
+from random import randrange
+from classes.MasterBehavior import MasterBehavior, Event
 
 # nDices = Numero de dados em uma rolagem
 # nFaces = Numero de faces de cada dado
@@ -20,22 +19,22 @@ class Roll:
         self.dices = dices
 
 
-class DiceController:
-    def __init__(self, club: Club):
-        self.club = club
-        self.strings = self.club.strings.dc
+class DiceController(MasterBehavior):
+    def __init__(self, master, key):
+        super().__init__(master, key)
+        self.strings = self.master.strings.dc
         self.commands = {
             'r ': self.r
         }
 
-    async def r(self, context: Context):
+    async def r(self, event: Event):
         try:
-            total, expression = self.getExpression(context.args)
+            total, expression = self.getExpression(event.args)
         except Exception:
-            await context.sendChannel(self.strings['arg_error'])
+            await event.send(self.strings['arg_error'])
             return
         # ENVIANDO UM ROLL, Retornando a mensagem
-        return await context.sendChannel(
+        return await event.send(
             self.strings['roll'], total=total, expression=expression)
 
     def roll(self, nDices: int, nFaces: int) -> Roll:

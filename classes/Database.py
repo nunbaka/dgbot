@@ -1,160 +1,127 @@
-from context import Msg
-from library import existKey, Json
+from library import Json, getKey
 from typing import Union, Tuple
-from unidecode import unidecode
+from classes.MasterBehavior import MasterBehavior, Message, Dict, Event
+from json import loads
+from classes.interface.ReactionMessage import PageMessage
 
 
-class Database(dict):
-    def __init__(self, pathfile="", default={}, *v, **kv):
-        self.pathfile = pathfile
-        super().__init__(Json.loadWrite(pathfile=pathfile, default=default))
+class Database(MasterBehavior):
+    def __init__(self, master, key, tKey=""):
+        super().__init__(master, key)
+        self.key += tKey
+        self.dict__init__(Json.loadWrite(self.local+self.key))
 
     def save(self):
-        Json.write(pathfile=self.pathfile, default=self, sort_keys=True)
+        Json.write(pathfile=self.local+self.key, default=self, sort_keys=True)
 
 
-class Element(dict):
+class Element(Dict):
     def __init__(self, elm_dict={}):
         super().__init__(elm_dict)
+        self.key = getKey(self['name'])
 
-    def get_id(self) -> Union[str, None]:
-        try:
-            elm_name = self['msg']['embed']['title']
-            elm_id = unidecode(str.lower(elm_name))
-            return elm_id
-        except Exception:
-            return None
+    def __str__(self):
+        return self['name']
 
-    def isSingle(self) -> (bool):
-        if existKey('single', self):
-            return self['single']
-        return True
+    def getEmbed(self) -> (dict):
+        embed = {
+            'title': self['name'],
+            'description': self['description'],
+            'image': self['image'],
+            'footer': self['tags']
+        }
+        return embed
 
-    def isPublic(self) -> (bool):
-        if existKey('public', self):
-            return self['public']
-        return True
+    def getMessage(self):
+        message = {
+            'content': "",
+            'embed': self.getEmbed()
+        }
+        return Message(message)
 
-    def isUnknown(self) -> (bool):
-        if existKey('unknown', self):
-            return self['unknown']
-        return False
-
-    def getMsg(self) -> (Msg):
-        msg = Msg(self['msg'])
-        if self.isUnknown():
-            msg.setDescription("")
-        return msg
+    def isPublic(self) -> bool:
+        return self['public']
 
 
 class Datalist(Database):
-    def __init__(self, local="", filename=""):
-        self.local = local
-        self.filename = filename
-        super().__init__(pathfile=local+filename+".json")
+    def __init__(self, master, key, tkey="_datalist"):
+        super().__init__(master, key, tkey)
 
-    def get_id(self, name) -> (str):
-        return unidecode(str.lower(name))
-
-    def exist_element(self, elm_name: str) -> (bool):
-        elm_id = self.get_id(elm_name)
-        return existKey(elm_id, self)
-
-    def new_element(self, elm_dict: dict) -> (Element):
+    def new_element(self, elm_dict: dict) -> Element:
         # a função que cria a datalist especificamente
         # separada do codigo para que classes herdadas
         # possam alterar o tipo de datalist
         # que o catalogo armazena
         return Element(elm_dict)
 
-    def get_element(self, elm_name: str) -> Union[Element, None]:
-        elm_id = self.get_id(elm_name)
-        if existKey(elm_id, self):
-            return self.new_element(self[elm_id])
-        return None
+    def add_element(self, elm_dict: dict) -> Element:
+        elm = self.new_element(elm_dict)
+        self.update({elm.key: elm_dict})
+        return elm
 
-    def add_element(self, elm_dict: dict) -> Union[Element, None]:
-        try:
-            elm = self.new_element(elm_dict)
-            self.update({elm.get_id(): elm_dict})
-            return elm
-        except Exception as inst:
-            print("Datalist add element error, ", inst)
-            return None
+    def remove_element(self, elm_name: str) -> Element:
+        elm_dict = self.delete(elm_name)
+        elm = self.new_element(elm_dict)
+        return elm
 
-    def remove_element(self, elm_name: str) -> Union[Element, None]:
-        elm_id = self.get_id(elm_name)
-        if existKey(elm_id, self):
-            elm = self.new_element(self[elm_id])
-            del self[elm_id]
-            return elm
-        return None
+    def get_element(self, elm_name: str) -> Element:
+        return self.new_element(self[elm_name])
+
+    def get_pages(self, limit=10):
+        values = list(self.values())
+        pages = []
+        text = ""
+        for i in range(len(values)):
+            elm = self.new_element(values[i])
+            if elm.isPublic():
+                i += 1
+                text += f"\t{i}: {elm}\n"
+                if i % limit == 0:
+                    pages.append(text)
+                    text = ""
+        if len(text) > 0:
+            pages.append(text)
+            text = ""
+        return pages
 
 
-class Catalog(dict):
-    def __init__(self, master, name=""):
-        # o objeto genérico, apenas considera um dono
-        # com um local para armazenar as informações
-        self.master = master
-        self.name = name
-        self.datalists = Database(
-            pathfile=master.local+name+"_catalog.json")
-        super().__init__(self.load_datalists())
-
-    def get_id(self, name) -> (str):
-        # transofrma o nome em um id universal
-        return unidecode(str.lower(name))
-
-    def exist_datalist(self, datalist_name: str) -> (bool):
-        # retorna true se existe a chave desta datalist
-        # ele verifica no catalogo, porém poderia verificar na datalist
-        datalist_id = self.get_id(datalist_name)
-        return existKey(datalist_id, self)
+class Catalog(MasterBehavior):
+    def __init__(self, master, key):
+        super().__init__(master, key)
+        self.local += self.key+"/"
+        self.datalists = Database(self, key, tKey="_catalog")
+        self.dict__init__(self.load_datalists())
 
     def new_datalist(self, datalist_name: str) -> (Datalist):
         # a função que cria a datalist especificamente
         # separada do codigo para que classes herdadas
         # possam alterar o tipo de datalist
         # que o catalogo armazena
-        datalist_id = self.get_id(datalist_name)
-        return Datalist(
-            local=self.master.local+self.name+"/",
-            filename=datalist_id)
+        return Datalist(self, datalist_name)
 
     def add_datalist(self, datalist_name: str) -> (bool):
         # instancia  a datalist no catalogo
-        if self.exist_datalist(datalist_name):
+        if self.contain(datalist_name):
             # se ja existe uma datalist o nome
             return False
         # instancia
-        datalist_id = self.get_id(datalist_name)
         datalist = self.new_datalist(datalist_name)
-        self[datalist_id] = datalist
-
+        self[datalist_name] = datalist
         # adicionando no registro
-        self.datalists[datalist_id] = datalist_name
+        self.datalists[datalist_name] = datalist_name
         self.datalists.save()
         return True
 
-    def remove_datalist(self, datalist_name: str) -> (bool):
-        if not self.exist_datalist(datalist_name):
-            return False
-        datalist_id = self.get_id(datalist_name)
-        del self[datalist_id]
-        del self.datalists[datalist_id]
-        self.datalists.save()
-        return True
-
-    def get_datalist(self, datalist_name: str) -> (Datalist):
-        datalist_id = self.get_id(datalist_name)
-        return self[datalist_id]
+    def remove_datalist(self, datalist_name: str) -> (Datalist):
+        datalist: Datalist = self.delete(datalist_name)
+        if self.datalists.delete(datalist_name):
+            self.datalists.save()
+        return datalist
 
     def add_element(self, datalist_name: str,
-                    elm_dict: dict) -> (Union[Element, None]):
+                    elm_dict: Dict) -> (Union[Element, None]):
         try:
-            if not self.exist_datalist(datalist_name):
-                return None
-            datalist = self.get_datalist(datalist_name)
+            datalist: Datalist = self[datalist_name]
             elm = datalist.add_element(elm_dict)
             datalist.save()
             return elm
@@ -164,10 +131,8 @@ class Catalog(dict):
     def remove_element(self, datalist_name: str,
                        elm_name: str) -> (Union[Element, None]):
         try:
-            if not self.exist_datalist(datalist_name):
-                return None
-            datalist = self.get_datalist(datalist_name)
-            elm = datalist.remove_element(elm_name)
+            datalist: Datalist = self[datalist_name]
+            elm: Element = datalist.delete(elm_name)
             datalist.save()
             return elm
         except Exception:
@@ -175,42 +140,185 @@ class Catalog(dict):
 
     def get_element(self, datalist_name: str,
                     elm_name: str) -> (Union[Element, None]):
-        if not self.exist_datalist(datalist_name):
+        try:
+            datalist: Datalist = self[datalist_name]
+            elm: Element = datalist.get_element(elm_name)
+            return elm
+        except Exception:
             return None
-        datalist = self.get_datalist(datalist_name)
-        elm = datalist.get_element(elm_name)
-        return elm
 
     def get_element_by_name(self, elm_name: str
                             ) -> Union[Tuple[None, None], Tuple[Element, str]]:
-        for datalist_id, datalist in self.items():
+        for datalist_key, datalist in self.items():
+            if not datalist:
+                continue
             elm = datalist.get_element(elm_name)
             if elm:
-                return elm, datalist_id
+                return elm, datalist_key
         return None, None
 
-    def get_pages(self) -> (list):
+    def get_all_pages(self) -> (list):
         pages = []
-        for datalist_id, datalist in self.items():
-            datalist_pages = []
-            datalist_name = self.datalists[datalist_id]
-            text = f"```>> {datalist_name} <<```"
-            i = 0
-            for elm_id, elm_dict in datalist.items():
-                embed = elm_dict['msg']['embed']
-                i += 1
-                text += f"{i} - {embed['title']}\n"
-                if i % 10 == 0:
-                    datalist_pages.append(text)
-                    text = ""
-            if len(text) > 0:
-                datalist_pages.append(text)
-            pages += datalist_pages
+        for datalist_key, datalist in self.items():
+            if not datalist:
+                continue
+            datalist_page = datalist.get_pages()
+            datalist_name = self.datalists[datalist_key]
+            datalist_title = f"```>>> {datalist_name} <<<```"
+            datalist_page[0] = datalist_title+datalist_page[0]
+            pages += datalist_page
         return pages
 
     def load_datalists(self) -> (dict):
         a = {}
-        for datalist_id, v in self.datalists.items():
-            a[datalist_id] = Datalist(
-                local=self.master.local+self.name+"/", filename=datalist_id)
+        for datalist_key, datalist_info in self.datalists.items():
+            a[datalist_key] = self.new_datalist(datalist_key)
         return a
+
+
+class Library(Catalog):
+    def __init__(self, master, key):
+        super().__init__(master, key)
+
+    async def add_datalist(self, event):
+        # cria uma nova datalist
+        s = self.strings['add_datalist']
+        # recebe o nome da datalist
+        datalist_name = " ".join(event.args)
+        success = super().add_datalist(datalist_name)
+        if success:
+            return await event.send(
+                s['success'],
+                title=datalist_name)
+        await event.send(
+            s['already_exist'],
+            title=datalist_name
+        )
+        return None
+
+    async def remove_datalist(self, event):
+        # cria uma nova datalist
+        s = self.strings['remove_datalist']
+        # cria uma nova datalist
+        datalist_name = " ".join(event.args)
+        success = super().remove_datalist(datalist_name)
+        if success:
+            # em caso de sucesso
+            return await event.send(
+                s['success'],
+                title=datalist_name)
+        # não existir datalist
+        await event.send(
+            s['no_datalist_fail'],
+            title=datalist_name)
+        return None
+
+    async def add_element(self, event):
+        # adiciona um elemento a uma datalist presente no catalogo
+        s = self.strings['add_element']
+        # pegando o nome da datalist
+        datalist_name = " ".join(event.args)
+        if len(datalist_name) == 0:
+            await event.send(
+                s['datalist_no_arg'])
+            return None
+        try:
+            # pegando o dicionário do elemento
+            elm_dict = loads(event.comment)
+        except Exception:
+            # em caso de dicionário mal informado
+            await event.send(
+                s['dict_error'])
+            return None
+        # tentando adicionar a datalist
+        elm = super().add_element(datalist_name, elm_dict)
+        if elm:
+            # em caso de sucesso
+            elm_msg = elm.getMessage()
+            elm_success = Message(s['success'])
+            elm_msg.mergeMessage(elm_success)
+            return await event.send(elm_msg)
+        # em caso de falha (sem datalist)
+        await event.send(
+            s['no_datalist_error'],
+            title=datalist_name)
+        return None
+
+    async def remove_element(self, event):
+        # remove um elemento de uma datalist do catalogo
+        s = self.strings['remove_element']
+        try:
+            # pega o primeiro argumento como nome do catalogo
+            datalist_name = event.args[0]
+            # pega o resto dos argumentos como nome do elemento
+            elm_name = " ".join(event.args[1:])
+        except Exception:
+            # em caso de uma entrada mal informada
+            await event.send(
+                s['args_error'])
+        # tentativa de remover o elemento da datalist
+        elm = super().remove_element(datalist_name, elm_name)
+        if elm:
+            # dando merge na mensagem do player + a de sucesso
+            msg = elm.getMsg()
+            msg.mergeMessage(s['success'])
+            return await event.send(
+                msg, title=elm_name)
+        # em caso de falha:
+        # pode ser por não existir datalist
+        # ou por não existir o elemento
+        await event.sendChannel(
+            s['no_exist_fail'])
+        return None
+
+    async def show_element(self, event: Event):
+        # mostrar o elemento de uma categoria
+        datalist_name = event.args[0]
+        datalist: Datalist = self[datalist_name]
+        if not datalist:
+            print("no datalist")
+            return None
+        elm_name = " ".join(event.args[1:])
+        elm = datalist.get_element(elm_name)
+        if not elm:
+            print("No Elm")
+            return None
+        elm_message = elm.getMessage()
+        return await event.send(elm_message)
+
+    async def show_element_by_name(self, event):
+        # mostrar o elemento de uma categoria
+        elm_name = " ".join(event.args)
+        elm, _ = self.get_element_by_name(elm_name)
+        if not elm:
+            print("No Elm")
+            return None
+        elm_message = elm.getMessage()
+        return await event.send(elm_message)
+        pass
+
+    async def show_datalist(self, event):
+        # mostrar o elemento de uma categoria
+        datalist_name = " ".join(event.args)
+        datalist: Datalist = self[datalist_name]
+        if not datalist:
+            print("no datalist")
+            return False
+        datalist_name = self.datalists[datalist_name]
+        datalist_title = f"```>>> {datalist_name} <<<```"
+        datalist_pages = datalist.get_pages()
+        pm = PageMessage(
+            event,
+            datalist_pages,
+            title=datalist_title)
+        await pm.run()
+        return True
+
+    async def show_catalog(self, event):
+        catalog_pages = self.get_all_pages()
+        pm = PageMessage(
+            event,
+            catalog_pages,
+            title=self.strings["catalog_name"])
+        await pm.run()
+        return True

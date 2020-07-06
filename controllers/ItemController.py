@@ -1,55 +1,39 @@
-from classes.Library import Library
+from classes.Database import Element, Datalist, Library
+# para criar um controller de biblioteca
+# precisa-se criar as 3 bases
+
+# biblioteca: catalogo de datalists
+# datalist: catalogo de elementos
+# element: o elemento propriamente dito
+
+
+class ItemElement(Element):
+    def __init__(self, elm_dict={}):
+        super().__init__(elm_dict)
+
+
+class ItemList(Datalist):
+    def __init__(self, *v, **kv):
+        super().__init__(*v, **kv)
+
+    def new_element(self, elm_dict) -> (ItemElement):
+        return ItemElement(elm_dict)
 
 
 class ItemController(Library):
-    def __init__(self, club):
-        super().__init__(club, name="items")
-        self.club = club
-        self.strings = club.strings.ic
+    def __init__(self, master, key):
+        super().__init__(master, key)
+        self.strings = self.master.strings.ic
         self.commands = {
-            "add list item": self.add_datalist,
-            "remove list item ": self.remove_datalist,
+            "new item list ": self.add_datalist,
+            "del item list ": self.remove_datalist,
             "add item ": self.add_element,
             "remove item ": self.remove_element,
-            "items": self.send_catalog,
-            "give item ": self.give,
-            "iv": self.show_inventory
+            "show item ": self.show_element,
+            "item ": self.show_element_by_name,
+            "show items ": self.show_datalist,
+            "items": self.show_catalog
         }
 
-    async def show_inventory(self, context):
-        user = context.author
-        player = self.club.getPlayer(user)
-        await context.channel.send(player.inventory.body)
-        return True
-
-    async def give(self, context):
-        # argumentos:
-        # @user item_name qtd
-        try:
-            # recebendo o user
-            user = context.users[0]
-            player = self.club.getPlayer(user)
-            if not player:
-                print("player sem ficha")
-                return None
-        except Exception as inst:
-            print("Necessita mencionar o user no primeiro argumento", inst)
-            return None
-        try:
-            # recebendo o nome do item
-            elm_name = context.args[1]
-        except Exception:
-            print("Necessita informar o nome do item corretamente")
-            return None
-        try:
-            qtd = int(context.args[2])
-        except Exception:
-            qtd = 1
-        # ao chegar aqui significa que os argumentos
-        #  foram minimamente informados
-        try:
-            elm, datalist_id = self.get_element_by_name(elm_name)
-            player.inventory.add_element(elm, qtd)
-        except Exception:
-            print("Elemento inexistente")
-            return None
+    def new_datalist(self, datalist_name):
+        return ItemList(self, datalist_name)

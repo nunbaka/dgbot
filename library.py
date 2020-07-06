@@ -1,6 +1,7 @@
 from json import load, dump
 import os
 import datetime
+from unidecode import unidecode
 
 RD = {
     "0": '0️⃣',
@@ -29,7 +30,7 @@ IRD = {
 }
 
 
-def existKey(_key: str, _dict: dict) -> (bool):
+def existKey(_key: str, _dict) -> (bool):
     try:
         return _key in list(_dict.keys())
     except Exception:
@@ -76,6 +77,10 @@ def getTimeKey():
     return currentDT.strftime("%d%H%M%S")
 
 
+def getKey(name):
+    return unidecode(str.lower(name))
+
+
 class Json:
     def load(pathfile="", encoding='utf-8'):
         try:
@@ -88,7 +93,7 @@ class Json:
 
     def loadWrite(pathfile="", default={}, encoding='utf-8'):
         try:
-            with open(pathfile, "r", encoding=encoding) as f:
+            with open(pathfile+".json", "r", encoding=encoding) as f:
                 data = load(f)
                 return data
         except IOError:
@@ -99,7 +104,7 @@ class Json:
                     os.mkdir(cur_path)
                 except Exception:
                     pass
-            with open(pathfile, 'w', encoding=encoding) as f:
+            with open(pathfile+".json", 'w', encoding=encoding) as f:
                 dump(default, f, indent=4, ensure_ascii=False)
                 return default
 
@@ -112,7 +117,7 @@ class Json:
                     os.mkdir(cur_path)
                 except Exception:
                     pass
-            with open(pathfile, 'w', encoding=encoding) as f:
+            with open(pathfile+".json", 'w', encoding=encoding) as f:
                 dump(default, f, indent=4, ensure_ascii=False, **kv)
                 return True
         except IOError:

@@ -1,5 +1,5 @@
 {
-    "catalog_name":"Catálogo de Itens:",
+    "catalog_name":"Catálogo de Itens:\n",
     "empty_catalog":{
         "content":"Sem itens para mostrar!"
     },
